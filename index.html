@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="PNR Ticket Status Display - Check your train ticket status">
+    <title>PNR Status</title>
+    
+    <!-- Tailwind CSS with custom configuration -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#137fec',
+                        'background-light': '#f6f7f8',
+                        'background-dark': '#101922'
+                    },
+                    fontFamily: {
+                        sans: ['Public Sans', 'system-ui', 'sans-serif']
+                    },
+                    fontWeight: {
+                        normal: '400',
+                        medium: '500',
+                        semibold: '600',
+                        bold: '700'
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Public Sans Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Material Symbols Font -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- Navigation utilities -->
+    <script src="navigation.js"></script>
+    <script src="error-handler.js"></script>
+    <script src="offline-manager.js"></script>
+    <script src="form-validator.js"></script>
+    <script src="navigation-manager.js"></script>
+    
+    <!-- Performance optimization utilities -->
+    <script src="build-config.js"></script>
+    <script src="css-optimizer.js"></script>
+    <script src="performance-dashboard.js"></script>
+    <script src="performance-monitor.js"></script>
+</head>
+<body class="font-sans bg-background-light dark:bg-background-dark text-slate-900 dark:text-white antialiased" style="min-height: max(884px, 100dvh);">
+    <!-- Main application container -->
+    <div id="app" class="min-h-full">
+        <!-- Content will be dynamically loaded here -->
+        <div id="screen-container" class="min-h-full">
+            <!-- Screen content will be loaded here -->
+        </div>
+    </div>
+
+    <!-- Navigation and Application Logic -->
+    <script>
+        // Navigation State Management
+        class NavigationManager {
+            constructor() {
+                this.currentScreen = null;
+                this.navigationHistory = [];
+                this.screenContainer = document.getElementById('screen-container');
+                this.screens = {
+                    'pnr-input': {
+                        path: 'pnr_input/code.html',
+                        title: 'PNR Status'
+                    },
+                    'ticket-status': {
+                        path: 'ticket_status_display_1/code.html',
+                        title: 'PNR Status'
+                    },
+                    'ticket-status-save': {
+                        path: 'ticket_status_display_2/code.html',
+                        title: 'PNR Status'
+                    },
+                    'ticket-status-notifications': {
+                        path: 'ticket_status_display_3/code.html',
+                        title: 'PNR Status'
+                    },
+                    'ticket-status-share': {
+                        path: 'ticket_status_display_4/code.html',
+                        title: 'PNR Status'
+                    },
+                    'pnr-history': {
+                        path: 'pnr_history_1/code.html',
+                        title: 'My PNRs'
+                    },
+                    'pnr-history-simple': {
+                        path: 'pnr_history_2/code.html',
+                        title: 'My PNRs'
+                    },
+                    'pnr-history-nav': {
+                        path: 'pnr_history_3/code.html',
+                        title: 'My PNRs'
+                    },
+                    'pnr-history-enhanced': {
+                        path: 'pnr_history_4/code.html',
+                        title: 'My PNRs'
+                    }
+                };
+                
+                this.init();
+            }
+
+            init() {
+                // Initialize with PNR input screen
+                this.navigateTo('pnr-input');
+                
+                // Handle browser back/forward buttons
+                window.addEventListener('popstate', (event) => {
+                    if (event.state && event.state.screen) {
+                        this.loadScreen(event.state.screen, event.state.data, false);
+                    }
+                });
+            }
+
+            async navigateTo(screenId, data = null, addToHistory = true) {
+                if (!this.screens[screenId]) {
+                    console.error('Screen not found:', screenId);
+                    return;
+                }
+
+                // Add to navigation history
+                if (addToHistory && this.currentScreen) {
+                    this.navigationHistory.push({
+                        screen: this.currentScreen,
+                        data: this.currentScreenData
+                    });
+                }
+
+                await this.loadScreen(screenId, data, addToHistory);
+            }
+
+            async loadScreen(screenId, data = null, updateHistory = true) {
+                try {
+                    const screen = this.screens[screenId];
+                    const response = await fetch(screen.path);
+                    
+                    if (!response.ok) {
+                        throw new Error(`Failed to load screen: ${response.status}`);
+                    }
+                    
+                    const html = await response.text();
+                    
+                    // Extract only the content inside the main app div
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const appContent = doc.querySelector('#app');
+                    
+                    if (appContent) {
+                        this.screenContainer.innerHTML = appContent.innerHTML;
+                    } else {
+                        // Fallback: use the entire body content
+                        const bodyContent = doc.querySelector('body');
+                        this.screenContainer.innerHTML = bodyContent.innerHTML;
+                    }
+
+                    // Add fade-in animation to new content
+                    this.screenContainer.classList.add('fade-in');
+
+                    // Update current screen tracking
+                    this.currentScreen = screenId;
+                    this.currentScreenData = data;
+
+                    // Update browser history
+                    if (updateHistory) {
+                        const state = { screen: screenId, data: data };
+                        history.pushState(state, screen.title, `#${screenId}`);
+                    }
+
+                    // Update document title
+                    document.title = screen.title;
+
+                    // Initialize screen-specific functionality
+                    this.initializeScreen(screenId, data);
+
+                } catch (error) {
+                    console.error('Error loading screen:', error);
+                    this.showError('Failed to load screen. Please try again.');
+                }
+            }
+
+            goBack() {
+                if (this.navigationHistory.length > 0) {
+                    const previousScreen = this.navigationHistory.pop();
+                    this.loadScreen(previousScreen.screen, previousScreen.data, true);
+                } else {
+                    // If no history, go to default screen
+                    this.navigateTo('pnr-input', null, false);
+                }
+            }
+
+            initializeScreen(screenId, data) {
+                // Re-run theme initialization
+                this.initializeTheme();
+
+                // Add back button functionality to all screens
+                this.setupBackButtons();
+
+                // Initialize screen-specific functionality
+                switch (screenId) {
+                    case 'pnr-input':
+                        this.initializePNRInput(data);
+                        break;
+                    case 'ticket-status':
+                    case 'ticket-status-save':
+                    case 'ticket-status-notifications':
+                    case 'ticket-status-share':
+                        this.initializeTicketStatus(screenId, data);
+                        break;
+                    case 'pnr-history':
+                    case 'pnr-history-simple':
+                    case 'pnr-history-nav':
+                    case 'pnr-history-enhanced':
+                        this.initializePNRHistory(screenId, data);
+                        break;
+                }
+            }
+
+            setupBackButtons() {
+                // Find all back buttons and add click handlers
+                const backButtons = document.querySelectorAll('[data-back-button], .back-button, button[aria-label*="back"], button[title*="back"]');
+                
+                // Also find buttons with back arrow icons
+                const backArrowButtons = document.querySelectorAll('button span.material-symbols-outlined');
+                backArrowButtons.forEach(span => {
+                    if (span.textContent.trim() === 'arrow_back') {
+                        const button = span.parentElement;
+                        backButtons.push(button);
+                        
+                        // Add accessibility attributes if not present
+                        if (!button.getAttribute('aria-label')) {
+                            button.setAttribute('aria-label', 'Go back to previous screen');
+                        }
+                        if (!button.getAttribute('role')) {
+                            button.setAttribute('role', 'button');
+                        }
+                    }
+                });
+
+                backButtons.forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        this.goBack();
+                    });
+                    
+                    // Add keyboard navigation support
+                    button.addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            this.goBack();
+                        }
+                    });
+                });
+            }
+
+            initializePNRInput(data) {
+                // Initialize PNR input screen functionality
+                const pnrInput = document.getElementById('pnr-input');
+                const clearBtn = document.getElementById('clear-btn');
+                const checkStatusBtn = document.getElementById('check-status-btn');
+
+                if (!pnrInput || !clearBtn || !checkStatusBtn) return;
+
+                // Pre-fill PNR if provided
+                if (data && data.pnr) {
+                    pnrInput.value = data.pnr;
+                    this.toggleClearButton(pnrInput, clearBtn);
+                }
+
+                // Clear button functionality
+                clearBtn.addEventListener('click', () => {
+                    pnrInput.value = '';
+                    this.toggleClearButton(pnrInput, clearBtn);
+                    pnrInput.focus();
+                });
+
+                // Input change handler
+                pnrInput.addEventListener('input', () => {
+                    this.toggleClearButton(pnrInput, clearBtn);
+                });
+
+                // Check status button
+                checkStatusBtn.addEventListener('click', () => {
+                    const pnrValue = pnrInput.value.trim();
+                    if (this.validatePNR(pnrValue)) {
+                        // Add to recent searches
+                        window.PNRApp.data.addToRecentSearches(pnrValue);
+                        this.navigateTo('ticket-status', { pnr: pnrValue });
+                    }
+                });
+
+                // Enter key submission
+                pnrInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        checkStatusBtn.click();
+                    }
+                });
+
+                // Initialize recent searches
+                this.initializeRecentSearches();
+
+                // Add navigation to history screen
+                const historyBtn = document.querySelector('[data-navigate="history"]');
+                if (historyBtn) {
+                    historyBtn.addEventListener('click', () => {
+                        this.navigateTo('pnr-history-enhanced');
+                    });
+                }
+            }
+
+            initializeTicketStatus(screenId, data) {
+                // Populate ticket status with actual data
+                if (data && data.pnr) {
+                    this.populateTicketStatusData(data.pnr);
+                }
+
+                // Find buttons by looking for specific icons or text content
+                const buttons = document.querySelectorAll('button');
+                let shareBtn, refreshBtn, saveBtn, notificationToggle;
+
+                buttons.forEach(button => {
+                    const icon = button.querySelector('span.material-symbols-outlined');
+                    const text = button.textContent.toLowerCase();
+                    
+                    if (icon) {
+                        const iconText = icon.textContent.trim();
+                        if (iconText === 'share' || iconText === 'more_vert') {
+                            shareBtn = button;
+                        } else if (iconText === 'refresh') {
+                            refreshBtn = button;
+                        } else if (iconText === 'bookmark_add' || text.includes('save')) {
+                            saveBtn = button;
+                        }
+                    }
+                });
+
+                // Find notification toggle
+                notificationToggle = document.querySelector('input[type="checkbox"]');
+
+                // Share button functionality
+                if (shareBtn) {
+                    shareBtn.addEventListener('click', () => {
+                        if (screenId !== 'ticket-status-share') {
+                            this.navigateTo('ticket-status-share', data);
+                        } else {
+                            // Show share modal
+                            const modal = document.querySelector('#share-modal, .share-modal');
+                            if (modal) {
+                                modal.classList.remove('hidden');
+                            }
+                        }
+                    });
+                }
+
+                // Refresh button functionality
+                if (refreshBtn) {
+                    refreshBtn.addEventListener('click', () => {
+                        console.log('Refreshing status for PNR:', data?.pnr);
+                        // Show loading state
+                        this.showRefreshLoading(refreshBtn);
+                        
+                        // Simulate API call
+                        setTimeout(() => {
+                            this.hideRefreshLoading(refreshBtn);
+                            if (data?.pnr) {
+                                this.populateTicketStatusData(data.pnr);
+                            }
+                        }, 1500);
+                    });
+                }
+
+                // Save PNR button functionality
+                if (saveBtn) {
+                    saveBtn.addEventListener('click', () => {
+                        if (data?.pnr) {
+                            window.PNRApp.data.savePNR(data.pnr);
+                            
+                            // Show success feedback
+                            this.showSaveSuccess(saveBtn);
+                            
+                            // Navigate to notifications screen after brief delay
+                            setTimeout(() => {
+                                this.navigateTo('ticket-status-notifications', data);
+                            }, 1000);
+                        }
+                    });
+                }
+
+                // Notification toggle functionality
+                if (notificationToggle && data?.pnr) {
+                    const settings = window.PNRApp.data.getNotificationSettings(data.pnr);
+                    notificationToggle.checked = settings.enabled;
+                    
+                    notificationToggle.addEventListener('change', () => {
+                        window.PNRApp.data.updateNotificationSettings(data.pnr, {
+                            enabled: notificationToggle.checked
+                        });
+                        
+                        // Show feedback
+                        this.showNotificationToggleFeedback(notificationToggle);
+                    });
+                }
+
+                // Initialize share modal if present
+                this.initializeShareModal();
+
+                // Add navigation to history from status screen
+                const historyBtn = document.querySelector('[data-navigate="history"]');
+                if (historyBtn) {
+                    historyBtn.addEventListener('click', () => {
+                        this.navigateTo('pnr-history-enhanced');
+                    });
+                }
+            }
+
+            initializePNRHistory(screenId, data) {
+                // Populate history with actual data
+                this.populateHistoryData(screenId);
+
+                // Find add button by looking for add icon
+                const buttons = document.querySelectorAll('button');
+                let addBtn;
+
+                buttons.forEach(button => {
+                    const icon = button.querySelector('span.material-symbols-outlined');
+                    if (icon && icon.textContent.trim() === 'add') {
+                        addBtn = button;
+                    }
+                });
+
+                // Add button functionality
+                if (addBtn) {
+                    addBtn.addEventListener('click', () => {
+                        this.navigateTo('pnr-input');
+                    });
+                }
+
+                // Initialize tab navigation if present
+                this.initializeTabNavigation();
+
+                // Initialize search and filters if present
+                this.initializeSearchAndFilters();
+
+                // Handle empty state actions
+                const emptyStateBtn = document.querySelector('[data-action="add-first-pnr"]');
+                if (emptyStateBtn) {
+                    emptyStateBtn.addEventListener('click', () => {
+                        this.navigateTo('pnr-input');
+                    });
+                }
+
+                // Handle bulk actions if present
+                const bulkActionBtns = document.querySelectorAll('[data-bulk-action]');
+                bulkActionBtns.forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const action = btn.dataset.bulkAction;
+                        this.handleBulkAction(action);
+                    });
+                });
+            }
+
+            // Helper methods
+            toggleClearButton(input, clearBtn) {
+                if (input.value.trim()) {
+                    clearBtn.classList.remove('opacity-0', 'invisible');
+                    clearBtn.classList.add('opacity-100', 'visible');
+                } else {
+                    clearBtn.classList.add('opacity-0', 'invisible');
+                    clearBtn.classList.remove('opacity-100', 'visible');
+                }
+            }
+
+            validatePNR(pnr) {
+                if (!pnr) {
+                    this.showError('Please enter a PNR number');
+                    return false;
+                }
+
+                const pnrPattern = /^[0-9-]+$/;
+                if (!pnrPattern.test(pnr)) {
+                    this.showError('Please enter a valid PNR number (numbers and dashes only)');
+                    return false;
+                }
+
+                return true;
+            }
+
+            savePNR(pnr) {
+                if (!pnr) return;
+                
+                // Save to localStorage (in real app would save to backend)
+                const savedPNRs = JSON.parse(localStorage.getItem('savedPNRs') || '[]');
+                if (!savedPNRs.includes(pnr)) {
+                    savedPNRs.push(pnr);
+                    localStorage.setItem('savedPNRs', JSON.stringify(savedPNRs));
+                }
+            }
+
+            initializeRecentSearches() {
+                const recentSearchesList = document.getElementById('recent-searches-list');
+                const recentSearchesEmpty = document.getElementById('recent-searches-empty');
+                
+                if (!recentSearchesList) return;
+
+                const recentSearches = window.PNRApp.data.getRecentSearches();
+                
+                if (recentSearches.length === 0) {
+                    if (recentSearchesEmpty) recentSearchesEmpty.classList.remove('hidden');
+                    recentSearchesList.innerHTML = '';
+                    return;
+                }
+
+                if (recentSearchesEmpty) recentSearchesEmpty.classList.add('hidden');
+                
+                recentSearchesList.innerHTML = recentSearches.map(pnr => `
+                    <div class="bg-white dark:bg-gray-800 rounded-lg p-4 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors cursor-pointer recent-search-item" data-pnr="${pnr}">
+                        <div class="flex items-center justify-between">
+                            <span class="text-slate-900 dark:text-white font-medium">${pnr}</span>
+                            <span class="material-symbols-outlined text-slate-400 dark:text-slate-500">
+                                arrow_forward
+                            </span>
+                        </div>
+                    </div>
+                `).join('');
+
+                // Add click handlers to recent search items
+                document.querySelectorAll('.recent-search-item').forEach(item => {
+                    item.addEventListener('click', () => {
+                        const pnr = item.dataset.pnr;
+                        this.navigateTo('ticket-status', { pnr });
+                    });
+                });
+            }
+
+            initializeShareModal() {
+                const modal = document.querySelector('#share-modal, .share-modal');
+                const closeBtn = document.querySelector('#close-modal, .close-modal');
+                const shareOptions = document.querySelectorAll('.share-option');
+
+                if (!modal) return;
+
+                // Close modal functionality
+                if (closeBtn) {
+                    closeBtn.addEventListener('click', () => {
+                        modal.classList.add('hidden');
+                    });
+                }
+
+                // Close modal when clicking overlay
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        modal.classList.add('hidden');
+                    }
+                });
+
+                // Share option handlers
+                shareOptions.forEach(option => {
+                    option.addEventListener('click', () => {
+                        const shareType = option.dataset.share;
+                        console.log('Sharing via:', shareType);
+                        
+                        // In real app would implement actual sharing
+                        switch (shareType) {
+                            case 'whatsapp':
+                                console.log('Share to WhatsApp');
+                                break;
+                            case 'messenger':
+                                console.log('Share to Messenger');
+                                break;
+                            case 'email':
+                                console.log('Share via Email');
+                                break;
+                            case 'copy':
+                                console.log('Copy to clipboard');
+                                break;
+                        }
+                        
+                        modal.classList.add('hidden');
+                    });
+                });
+            }
+
+            initializeSearchAndFilters() {
+                // Implementation for search and filter functionality
+                const searchInput = document.querySelector('input[placeholder*="Search"]');
+                const filterButtons = document.querySelectorAll('[data-filter]');
+                
+                if (searchInput) {
+                    let searchTimeout;
+                    searchInput.addEventListener('input', (e) => {
+                        clearTimeout(searchTimeout);
+                        searchTimeout = setTimeout(() => {
+                            this.filterPNRList(e.target.value);
+                        }, 300);
+                    });
+                }
+
+                // Filter button functionality
+                filterButtons.forEach(button => {
+                    button.addEventListener('click', () => {
+                        const filterType = button.dataset.filter;
+                        this.applyFilter(filterType);
+                        
+                        // Update button states
+                        filterButtons.forEach(btn => btn.classList.remove('bg-primary', 'text-white'));
+                        button.classList.add('bg-primary', 'text-white');
+                    });
+                });
+            }
+
+            filterPNRList(searchTerm) {
+                const cards = document.querySelectorAll('.pnr-card');
+                const term = searchTerm.toLowerCase();
+
+                cards.forEach(card => {
+                    const pnr = card.dataset.pnr;
+                    const cardText = card.textContent.toLowerCase();
+                    
+                    if (cardText.includes(term) || pnr.includes(term)) {
+                        card.style.display = 'block';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            }
+
+            applyFilter(filterType) {
+                const cards = document.querySelectorAll('.pnr-card');
+                
+                cards.forEach(card => {
+                    const pnr = card.dataset.pnr;
+                    const pnrData = window.PNRApp.data.getPNRData(pnr);
+                    let shouldShow = true;
+
+                    switch (filterType) {
+                        case 'all':
+                            shouldShow = true;
+                            break;
+                        case 'confirmed':
+                            shouldShow = pnrData?.status === 'confirmed';
+                            break;
+                        case 'waitlisted':
+                            shouldShow = pnrData?.status === 'waitlisted';
+                            break;
+                        case 'cancelled':
+                            shouldShow = pnrData?.status === 'cancelled';
+                            break;
+                        case 'alerts':
+                            const settings = window.PNRApp.data.getNotificationSettings(pnr);
+                            shouldShow = settings.enabled;
+                            break;
+                    }
+
+                    card.style.display = shouldShow ? 'block' : 'none';
+                });
+            }
+
+            extractPNRFromCard(card) {
+                // Extract PNR number from card content
+                const pnrText = card.textContent.match(/\d{3}-\d{7}/);
+                return pnrText ? pnrText[0] : null;
+            }
+
+            showError(message) {
+                // Simple error display - in real app would use proper toast/modal
+                alert(message);
+            }
+
+            populateTicketStatusData(pnr) {
+                const pnrData = window.PNRApp.data.getPNRData(pnr);
+                if (!pnrData) return;
+
+                // Update PNR number displays
+                const pnrElements = document.querySelectorAll('[data-pnr-display]');
+                pnrElements.forEach(el => el.textContent = pnr);
+
+                // Update status displays
+                const statusElements = document.querySelectorAll('[data-status-display]');
+                statusElements.forEach(el => {
+                    el.textContent = pnrData.status.toUpperCase();
+                    el.className = el.className.replace(/bg-\w+-\d+/, window.PNRApp.ui.getStatusIconColor(pnrData.status));
+                });
+
+                // Update train details
+                const trainElements = document.querySelectorAll('[data-train-display]');
+                trainElements.forEach(el => {
+                    el.textContent = `${pnrData.train.number} | ${pnrData.train.name}`;
+                });
+
+                // Update journey details
+                const departureElements = document.querySelectorAll('[data-departure-display]');
+                departureElements.forEach(el => el.textContent = `${pnrData.journey.from} ${pnrData.journey.departure}`);
+
+                const arrivalElements = document.querySelectorAll('[data-arrival-display]');
+                arrivalElements.forEach(el => el.textContent = `${pnrData.journey.to} ${pnrData.journey.arrival}`);
+            }
+
+            populateHistoryData(screenId) {
+                const savedPNRs = window.PNRApp.data.getSavedPNRs();
+                const recentSearches = window.PNRApp.data.getRecentSearches();
+                
+                // Determine which list to populate based on screen
+                const isSavedTab = screenId.includes('history') && !screenId.includes('simple');
+                const pnrList = isSavedTab ? savedPNRs : recentSearches;
+
+                // Find the container for PNR cards
+                const listContainer = document.querySelector('#saved-pnr-list, #history-pnr-list, .pnr-list');
+                const emptyState = document.querySelector('#saved-empty-state, #history-empty-state, .empty-state');
+
+                if (!listContainer) return;
+
+                if (pnrList.length === 0) {
+                    if (emptyState) emptyState.classList.remove('hidden');
+                    listContainer.innerHTML = '';
+                    return;
+                }
+
+                if (emptyState) emptyState.classList.add('hidden');
+
+                // Generate PNR cards
+                listContainer.innerHTML = pnrList.map(pnr => {
+                    const pnrData = window.PNRApp.data.getPNRData(pnr);
+                    if (!pnrData) return '';
+
+                    const statusColor = window.PNRApp.ui.getStatusIconColor(pnrData.status);
+                    const statusBadgeColor = window.PNRApp.ui.getStatusColorClass(pnrData.status);
+                    const isClickable = screenId.includes('nav') || screenId.includes('enhanced');
+                    const showNotifications = isSavedTab && screenId.includes('history-1');
+
+                    return `
+                        <div class="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-4 ${isClickable ? 'hover:bg-slate-50 dark:hover:bg-slate-700/50 cursor-pointer' : ''} transition-colors pnr-card" data-pnr="${pnr}" ${isClickable ? 'data-clickable="true"' : ''}>
+                            <div class="flex items-start space-x-3">
+                                <div class="w-10 h-10 ${statusColor} rounded-full flex items-center justify-center flex-shrink-0">
+                                    <span class="material-symbols-outlined text-white text-lg">
+                                        ${pnrData.status === 'confirmed' ? 'check_circle' : pnrData.status === 'waitlisted' ? 'schedule' : 'cancel'}
+                                    </span>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <div class="flex items-center space-x-2">
+                                            <span class="font-medium text-slate-900 dark:text-white">${pnr}</span>
+                                            ${showNotifications ? '<span class="material-symbols-outlined text-primary text-lg">notifications_active</span>' : ''}
+                                        </div>
+                                        <span class="px-2 py-1 text-xs font-medium rounded-full ${statusBadgeColor}">
+                                            ${pnrData.status.charAt(0).toUpperCase() + pnrData.status.slice(1)}
+                                        </span>
+                                    </div>
+                                    <div class="text-sm text-slate-600 dark:text-slate-400 mb-1">
+                                        From: ${pnrData.journey.from.split(' (')[0]} To: ${pnrData.journey.to.split(' (')[0]}
+                                    </div>
+                                    <div class="text-sm text-slate-500 dark:text-slate-500">
+                                        ${pnrData.journey.departure.split(',')[0]}
+                                    </div>
+                                    ${showNotifications ? `
+                                        <div class="mt-3 pt-3 border-t border-slate-200 dark:border-slate-700">
+                                            <button class="flex items-center space-x-2 text-sm text-slate-600 dark:text-slate-400 hover:text-primary transition-colors notification-settings-btn" data-pnr="${pnr}">
+                                                <span class="material-symbols-outlined text-lg">settings</span>
+                                                <span>Notification Settings</span>
+                                            </button>
+                                        </div>
+                                    ` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).filter(Boolean).join('');
+
+                // Add click handlers for clickable cards
+                if (isClickable) {
+                    document.querySelectorAll('.pnr-card[data-clickable="true"]').forEach(card => {
+                        card.addEventListener('click', () => {
+                            const pnr = card.dataset.pnr;
+                            this.navigateTo('ticket-status', { pnr });
+                        });
+                    });
+                }
+
+                // Add notification settings handlers
+                document.querySelectorAll('.notification-settings-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const pnr = btn.dataset.pnr;
+                        console.log('Opening notification settings for:', pnr);
+                        // In real app would open settings modal
+                    });
+                });
+            }
+
+            initializeTabNavigation() {
+                const tabs = document.querySelectorAll('[data-tab]');
+                if (tabs.length === 0) return;
+
+                tabs.forEach(tab => {
+                    tab.addEventListener('click', () => {
+                        // Remove active state from all tabs
+                        tabs.forEach(t => {
+                            t.classList.remove('text-primary', 'border-primary');
+                            t.classList.add('text-slate-600', 'dark:text-slate-400');
+                        });
+
+                        // Add active state to clicked tab
+                        tab.classList.add('text-primary', 'border-primary');
+                        tab.classList.remove('text-slate-600', 'dark:text-slate-400');
+
+                        // Switch content based on tab
+                        const tabType = tab.dataset.tab;
+                        if (tabType === 'saved') {
+                            this.populateHistoryData('pnr-history');
+                        } else if (tabType === 'history') {
+                            this.populateHistoryData('pnr-history-simple');
+                        }
+                    });
+                });
+            }
+
+            initializeTheme() {
+                // Re-initialize theme functionality for dynamically loaded content
+                if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                    document.documentElement.classList.add('dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                }
+            }
+
+            // Enhanced UI feedback methods
+            showRefreshLoading(button) {
+                const icon = button.querySelector('span.material-symbols-outlined');
+                if (icon) {
+                    icon.style.animation = 'spin 1s linear infinite';
+                    button.disabled = true;
+                    button.classList.add('opacity-75');
+                }
+            }
+
+            hideRefreshLoading(button) {
+                const icon = button.querySelector('span.material-symbols-outlined');
+                if (icon) {
+                    icon.style.animation = '';
+                    button.disabled = false;
+                    button.classList.remove('opacity-75');
+                }
+            }
+
+            showSaveSuccess(button) {
+                const originalText = button.innerHTML;
+                button.innerHTML = '<span class="material-symbols-outlined">check</span> Saved!';
+                button.classList.add('bg-green-500', 'text-white');
+                
+                setTimeout(() => {
+                    button.innerHTML = originalText;
+                    button.classList.remove('bg-green-500', 'text-white');
+                }, 2000);
+            }
+
+            showNotificationToggleFeedback(toggle) {
+                const label = toggle.nextElementSibling;
+                if (label) {
+                    const originalText = label.textContent;
+                    label.textContent = toggle.checked ? 'Notifications enabled!' : 'Notifications disabled';
+                    
+                    setTimeout(() => {
+                        label.textContent = originalText;
+                    }, 2000);
+                }
+            }
+
+            handleBulkAction(action) {
+                const selectedCards = document.querySelectorAll('.pnr-card input[type="checkbox"]:checked');
+                const selectedPNRs = Array.from(selectedCards).map(cb => cb.closest('.pnr-card').dataset.pnr);
+
+                switch (action) {
+                    case 'delete':
+                        if (confirm(`Delete ${selectedPNRs.length} selected PNRs?`)) {
+                            selectedPNRs.forEach(pnr => {
+                                window.PNRApp.data.removeSavedPNR(pnr);
+                            });
+                            this.populateHistoryData(this.currentScreen);
+                        }
+                        break;
+                    case 'enable-notifications':
+                        selectedPNRs.forEach(pnr => {
+                            window.PNRApp.data.updateNotificationSettings(pnr, { enabled: true });
+                        });
+                        this.populateHistoryData(this.currentScreen);
+                        break;
+                    case 'disable-notifications':
+                        selectedPNRs.forEach(pnr => {
+                            window.PNRApp.data.updateNotificationSettings(pnr, { enabled: false });
+                        });
+                        this.populateHistoryData(this.currentScreen);
+                        break;
+                }
+            }
+
+            // Enhanced data validation and error handling
+            validatePNRWithFeedback(pnr, inputElement) {
+                const errorElement = document.querySelector('#pnr-error') || this.createErrorElement(inputElement);
+                
+                if (!pnr) {
+                    this.showInputError(inputElement, errorElement, 'Please enter a PNR number');
+                    return false;
+                }
+
+                const pnrPattern = /^[0-9]{3}-[0-9]{7}$/;
+                if (!pnrPattern.test(pnr)) {
+                    this.showInputError(inputElement, errorElement, 'Please enter a valid PNR format (e.g., 245-1234567)');
+                    return false;
+                }
+
+                this.hideInputError(inputElement, errorElement);
+                return true;
+            }
+
+            createErrorElement(inputElement) {
+                const errorElement = document.createElement('div');
+                errorElement.id = 'pnr-error';
+                errorElement.className = 'text-red-500 text-sm mt-1 hidden';
+                inputElement.parentNode.appendChild(errorElement);
+                return errorElement;
+            }
+
+            showInputError(inputElement, errorElement, message) {
+                inputElement.classList.add('border-red-500', 'focus:border-red-500');
+                errorElement.textContent = message;
+                errorElement.classList.remove('hidden');
+            }
+
+            hideInputError(inputElement, errorElement) {
+                inputElement.classList.remove('border-red-500', 'focus:border-red-500');
+                errorElement.classList.add('hidden');
+            }
+        }
+
+        // Theme management functions
+        function toggleTheme() {
+            document.documentElement.classList.toggle('dark');
+            const isDark = document.documentElement.classList.contains('dark');
+            localStorage.theme = isDark ? 'dark' : 'light';
+        }
+        
+        function setTheme(theme) {
+            localStorage.theme = theme;
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        }
+
+        // Global navigation instance
+        let navigationManager;
+
+        // Initialize application when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            navigationManager = new NavigationManager();
+            
+            // Expose navigation functions globally for easy access
+            window.navigateTo = (screen, data) => navigationManager.navigateTo(screen, data);
+            window.goBack = () => navigationManager.goBack();
+        });
+    </script>
+</body>
+</html>

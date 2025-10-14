@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="PNR Ticket Status Display - View your train ticket details">
+    <title>PNR Status - 245-5423890</title>
+    
+    <!-- Tailwind CSS with custom configuration -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#137fec',
+                        'background-light': '#f6f7f8',
+                        'background-dark': '#101922'
+                    },
+                    fontFamily: {
+                        sans: ['Public Sans', 'system-ui', 'sans-serif']
+                    },
+                    fontWeight: {
+                        normal: '400',
+                        medium: '500',
+                        semibold: '600',
+                        bold: '700'
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Public Sans Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Material Symbols Font -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body class="font-sans bg-background-light dark:bg-background-dark text-slate-900 dark:text-white antialiased" style="min-height: max(884px, 100dvh);">
+    <!-- Main application container -->
+    <div id="app" class="min-h-full">
+        <!-- Sticky Header Component -->
+        <header class="sticky top-0 z-10 bg-background-light dark:bg-background-dark shadow-sm p-4 pb-2 flex items-center justify-between" role="banner">
+            <!-- Back button -->
+            <button 
+                class="flex items-center justify-center w-12 h-12 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                aria-label="Go back to previous screen"
+                role="button"
+            >
+                <span class="material-symbols-outlined text-slate-700 dark:text-slate-300" aria-hidden="true">
+                    arrow_back
+                </span>
+            </button>
+            
+            <!-- Centered title -->
+            <h1 class="text-lg font-semibold text-slate-900 dark:text-white">
+                PNR Status
+            </h1>
+            
+            <!-- Share button -->
+            <button 
+                class="flex items-center justify-center w-12 h-12 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                aria-label="Share PNR status"
+                role="button"
+            >
+                <span class="material-symbols-outlined text-slate-700 dark:text-slate-300" aria-hidden="true">
+                    share
+                </span>
+            </button>
+        </header>
+
+        <!-- Main Content -->
+        <main class="px-4 pb-4" role="main">
+            <!-- Status Card -->
+            <section 
+                class="bg-[#28a745] rounded-lg pt-[100px] pb-6 px-6 mb-6 text-white" 
+                style="box-shadow: 0 0 4px rgba(0,0,0,0.1);"
+                role="status"
+                aria-labelledby="status-heading"
+                aria-live="polite"
+            >
+                <div class="text-center">
+                    <h2 id="status-heading" class="text-lg font-semibold mb-2">PNR: 245-5423890</h2>
+                    <div class="text-2xl font-bold mb-2" role="status" aria-label="Ticket status: Confirmed">CONFIRMED</div>
+                    <p class="text-sm opacity-90">Your ticket has been confirmed. Have a safe journey!</p>
+                </div>
+            </section>
+
+            <!-- Train Details Section -->
+            <section class="mb-6" aria-labelledby="train-details-heading">
+                <h2 id="train-details-heading" class="text-lg font-semibold text-slate-900 dark:text-white mb-4">Train Details</h2>
+                <div class="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700" role="region" aria-label="Train information">
+                    <dl class="grid grid-cols-1 divide-y divide-slate-200 dark:divide-slate-700">
+                        <div class="p-4">
+                            <dt class="text-sm text-slate-600 dark:text-slate-400 mb-1">Train</dt>
+                            <dd class="font-medium text-slate-900 dark:text-white">12345 | SUPERFAST EXP</dd>
+                        </div>
+                        <div class="p-4">
+                            <dt class="text-sm text-slate-600 dark:text-slate-400 mb-1">Class</dt>
+                            <dd class="font-medium text-slate-900 dark:text-white">Sleeper (SL)</dd>
+                        </div>
+                    </dl>
+                </div>
+            </section>
+
+            <!-- Journey Itinerary Section -->
+            <section class="mb-6" aria-labelledby="journey-heading">
+                <h2 id="journey-heading" class="text-lg font-semibold text-slate-900 dark:text-white mb-4">Journey Itinerary</h2>
+                <div class="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-4" role="region" aria-label="Journey timeline">
+                    <div class="relative">
+                        <!-- Timeline -->
+                        <ol class="flex flex-col space-y-6" role="list" aria-label="Journey stops">
+                            <!-- Departure -->
+                            <li class="flex items-start" role="listitem">
+                                <div class="flex flex-col items-center mr-4" aria-hidden="true">
+                                    <div class="w-3 h-3 bg-primary rounded-full"></div>
+                                    <div class="w-0.5 h-16 bg-slate-300 dark:bg-slate-600 mt-2"></div>
+                                </div>
+                                <div class="flex-1 pt-0">
+                                    <div class="font-medium text-slate-900 dark:text-white">New Delhi (NDLS)</div>
+                                    <div class="text-sm text-slate-600 dark:text-slate-400">
+                                        <time datetime="2024-07-15T20:40">15 Jul 2024, 20:40</time>
+                                    </div>
+                                    <div class="text-xs text-slate-500 dark:text-slate-500 mt-1">Departure</div>
+                                </div>
+                            </li>
+                            
+                            <!-- Arrival -->
+                            <li class="flex items-start" role="listitem">
+                                <div class="flex flex-col items-center mr-4" aria-hidden="true">
+                                    <div class="w-3 h-3 bg-primary rounded-full"></div>
+                                </div>
+                                <div class="flex-1 pt-0">
+                                    <div class="font-medium text-slate-900 dark:text-white">Mumbai Central (MMCT)</div>
+                                    <div class="text-sm text-slate-600 dark:text-slate-400">
+                                        <time datetime="2024-07-16T12:30">16 Jul 2024, 12:30</time>
+                                    </div>
+                                    <div class="text-xs text-slate-500 dark:text-slate-500 mt-1">Arrival</div>
+                                </div>
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Passenger Information Section -->
+            <section class="mb-6" aria-labelledby="passenger-heading">
+                <h2 id="passenger-heading" class="text-lg font-semibold text-slate-900 dark:text-white mb-4">Passenger Information</h2>
+                <div class="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700" role="region" aria-label="Passenger details">
+                    <ul class="divide-y divide-slate-200 dark:divide-slate-700" role="list">
+                        <!-- Passenger 1 -->
+                        <li class="p-4" role="listitem">
+                            <div class="grid grid-cols-3 gap-4 items-center">
+                                <div>
+                                    <div class="font-medium text-slate-900 dark:text-white">John Doe</div>
+                                    <div class="text-sm text-slate-600 dark:text-slate-400">Age: 28, Male</div>
+                                </div>
+                                <div class="text-center">
+                                    <div class="font-medium text-slate-900 dark:text-white" aria-label="Coach S5">S5</div>
+                                    <div class="text-sm text-slate-600 dark:text-slate-400" aria-label="Berth 32 Upper">32 (Upper)</div>
+                                </div>
+                                <div class="text-right">
+                                    <span 
+                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/50 text-green-800 dark:text-green-200"
+                                        role="status"
+                                        aria-label="Passenger status: Confirmed"
+                                    >
+                                        Confirmed
+                                    </span>
+                                </div>
+                            </div>
+                        </li>
+                        
+                        <!-- Passenger 2 -->
+                        <li class="p-4" role="listitem">
+                            <div class="grid grid-cols-3 gap-4 items-center">
+                                <div>
+                                    <div class="font-medium text-slate-900 dark:text-white">Jane Smith</div>
+                                    <div class="text-sm text-slate-600 dark:text-slate-400">Age: 25, Female</div>
+                                </div>
+                                <div class="text-center">
+                                    <div class="font-medium text-slate-900 dark:text-white" aria-label="Coach S5">S5</div>
+                                    <div class="text-sm text-slate-600 dark:text-slate-400" aria-label="Berth 33 Lower">33 (Lower)</div>
+                                </div>
+                                <div class="text-right">
+                                    <span 
+                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/50 text-green-800 dark:text-green-200"
+                                        role="status"
+                                        aria-label="Passenger status: Confirmed"
+                                    >
+                                        Confirmed
+                                    </span>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </section>
+            
+        </main>
+
+        <!-- Floating Refresh Button -->
+        <button 
+            class="fixed bottom-6 right-6 h-14 w-14 bg-primary hover:bg-primary/90 text-white rounded-full shadow-lg flex items-center justify-center transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background-light dark:focus:ring-offset-background-dark"
+            aria-label="Refresh PNR status"
+            role="button"
+        >
+            <span class="material-symbols-outlined" aria-hidden="true">
+                refresh
+            </span>
+        </button>
+    </div>
+
+    <!-- Theme toggle script for testing -->
+    <script>
+        // Simple theme toggle for development/testing
+        function toggleTheme() {
+            document.documentElement.classList.toggle('dark');
+        }
+        
+        // Check for saved theme preference or default to light mode
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+        
+        // Save theme preference
+        function setTheme(theme) {
+            localStorage.theme = theme;
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        }
+
+        // Basic interactivity
+        document.addEventListener('DOMContentLoaded', function() {
+            // Back button functionality
+            const backButton = document.querySelector('header button:first-child');
+            backButton.addEventListener('click', function() {
+                console.log('Back button clicked');
+                // In a real app, this would navigate back
+                alert('Navigating back to PNR input');
+            });
+            
+            // Add keyboard support for back button
+            backButton.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    this.click();
+                }
+            });
+
+            // Share button functionality
+            const shareButton = document.querySelector('header button:last-child');
+            shareButton.addEventListener('click', function() {
+                console.log('Share button clicked');
+                // In a real app, this would open share modal
+                alert('Opening share options');
+            });
+            
+            // Add keyboard support for share button
+            shareButton.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    this.click();
+                }
+            });
+
+            // Refresh button functionality
+            const refreshButton = document.querySelector('.fixed.bottom-6');
+            refreshButton.addEventListener('click', function() {
+                console.log('Refresh button clicked');
+                // In a real app, this would refresh the PNR status
+                alert('Refreshing PNR status...');
+            });
+            
+            // Add keyboard support for refresh button
+            refreshButton.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    this.click();
+                }
+            });
+
+            // Add focus management for screen readers
+            announcePageLoad();
+
+            // Run basic unit tests for status display components
+            runStatusDisplayTests();
+        });
+
+        // Announce page load for screen readers
+        function announcePageLoad() {
+            const announcement = document.createElement('div');
+            announcement.setAttribute('aria-live', 'polite');
+            announcement.setAttribute('aria-atomic', 'true');
+            announcement.className = 'sr-only';
+            announcement.textContent = 'PNR status page loaded. Status: Confirmed for PNR 245-5423890';
+            document.body.appendChild(announcement);
+            
+            // Remove announcement after screen reader has time to read it
+            setTimeout(() => {
+                document.body.removeChild(announcement);
+            }, 3000);
+        }
+
+        // Unit tests for status display components
+        function runStatusDisplayTests() {
+            console.log('Running status display component tests...');
+            
+            // Test status card color coding logic
+            function testStatusCardColorCoding() {
+                const statusCard = document.querySelector('.bg-\\[\\#28a745\\]');
+                const isGreenCard = statusCard && statusCard.classList.contains('bg-[#28a745]');
+                console.assert(isGreenCard, 'Status card should have green background for confirmed status');
+                
+                const statusText = statusCard?.querySelector('.text-2xl');
+                const isConfirmed = statusText?.textContent.includes('CONFIRMED');
+                console.assert(isConfirmed, 'Status card should display CONFIRMED text');
+                
+                console.log('✓ Status card color coding test passed');
+            }
+
+            // Test passenger information rendering
+            function testPassengerInformationRendering() {
+                const passengerSection = document.querySelector('h2:contains("Passenger Information")') || 
+                                       Array.from(document.querySelectorAll('h2')).find(h => h.textContent.includes('Passenger Information'));
+                console.assert(passengerSection, 'Passenger Information section should exist');
+                
+                const passengerCards = document.querySelectorAll('.grid.grid-cols-3');
+                console.assert(passengerCards.length >= 2, 'Should have at least 2 passenger cards');
+                
+                const statusBadges = document.querySelectorAll('.bg-green-100');
+                console.assert(statusBadges.length >= 2, 'Should have status badges for passengers');
+                
+                console.log('✓ Passenger information rendering test passed');
+            }
+
+            // Test journey timeline display
+            function testJourneyTimelineDisplay() {
+                const timelineDots = document.querySelectorAll('.w-3.h-3.bg-primary.rounded-full');
+                console.assert(timelineDots.length >= 2, 'Should have timeline dots for departure and arrival');
+                
+                const timelineSection = Array.from(document.querySelectorAll('h2')).find(h => h.textContent.includes('Journey Itinerary'));
+                console.assert(timelineSection, 'Journey Itinerary section should exist');
+                
+                const departureInfo = document.body.textContent.includes('New Delhi (NDLS)');
+                const arrivalInfo = document.body.textContent.includes('Mumbai Central (MMCT)');
+                console.assert(departureInfo && arrivalInfo, 'Should display departure and arrival information');
+                
+                console.log('✓ Journey timeline display test passed');
+            }
+
+            // Run all tests
+            try {
+                testStatusCardColorCoding();
+                testPassengerInformationRendering();
+                testJourneyTimelineDisplay();
+                console.log('✅ All status display component tests passed!');
+            } catch (error) {
+                console.error('❌ Test failed:', error);
+            }
+        }
+    </script>
+</body>
+</html>

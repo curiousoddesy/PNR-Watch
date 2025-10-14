@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="description" content="PNR Ticket Status Display - Check your train ticket status">
+    <title>PNR Status</title>
+    
+    <!-- Tailwind CSS with custom configuration -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#137fec',
+                        'background-light': '#f6f7f8',
+                        'background-dark': '#101922'
+                    },
+                    fontFamily: {
+                        sans: ['Public Sans', 'system-ui', 'sans-serif']
+                    },
+                    fontWeight: {
+                        normal: '400',
+                        medium: '500',
+                        semibold: '600',
+                        bold: '700'
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Public Sans Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Material Symbols Font -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body class="font-sans bg-background-light dark:bg-background-dark text-slate-900 dark:text-white antialiased safe-area-inset-top safe-area-inset-bottom" style="min-height: max(884px, 100dvh);">
+    <!-- Main application container -->
+    <div id="app" class="min-h-full">
+        <!-- Header Component -->
+        <header class="responsive-nav flex items-center justify-between safe-area-inset-left safe-area-inset-right" role="banner">
+            <!-- Back button -->
+            <button 
+                class="responsive-nav-button flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                aria-label="Go back to previous screen"
+                role="button"
+            >
+                <span class="material-symbols-outlined text-slate-700 dark:text-slate-300" aria-hidden="true">
+                    arrow_back
+                </span>
+            </button>
+            
+            <!-- Centered title -->
+            <h1 class="responsive-nav-title font-semibold text-slate-900 dark:text-white">
+                PNR Status
+            </h1>
+            
+            <!-- Empty space for balance (same width as back button) -->
+            <div class="responsive-nav-button" aria-hidden="true"></div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="responsive-padding safe-area-inset-left safe-area-inset-right pb-4" role="main">
+            <!-- PNR Input Form -->
+            <form class="mb-6" role="form" aria-label="PNR Status Check Form">
+                <label for="pnr-input" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                    Enter PNR Number
+                </label>
+                <div class="relative">
+                    <input 
+                        type="text" 
+                        id="pnr-input"
+                        name="pnr"
+                        placeholder="e.g., 245-1234567"
+                        aria-describedby="pnr-help"
+                        aria-required="true"
+                        autocomplete="off"
+                        class="responsive-input w-full pr-12 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-500 dark:placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
+                    />
+                    <!-- Clear button -->
+                    <button 
+                        type="button"
+                        id="clear-btn"
+                        aria-label="Clear PNR input"
+                        class="absolute right-3 top-1/2 transform -translate-y-1/2 p-1 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors opacity-0 invisible focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1 touch-target"
+                    >
+                        <span class="material-symbols-outlined text-slate-500 dark:text-slate-400 text-xl" aria-hidden="true">
+                            close
+                        </span>
+                    </button>
+                </div>
+                <div id="pnr-help" class="sr-only">
+                    Enter your 10-digit PNR number to check ticket status
+                </div>
+            </form>
+
+            <!-- Check Status Button -->
+            <button 
+                type="submit"
+                id="check-status-btn"
+                aria-describedby="check-status-help"
+                class="responsive-button w-full bg-primary hover:bg-primary/90 text-white font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background-light dark:focus:ring-offset-background-dark"
+            >
+                Check Status
+            </button>
+            <div id="check-status-help" class="sr-only">
+                Submit form to check PNR status
+            </div>
+
+            <!-- Informational Text -->
+            <div class="mt-6 mb-6">
+                <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                    PNR (Passenger Name Record) is a unique 10-digit number assigned to every train ticket. 
+                    You can find it on your ticket or booking confirmation.
+                </p>
+            </div>
+
+            <!-- Recent Searches Section -->
+            <section id="recent-searches-section" class="mt-6" aria-labelledby="recent-searches-heading">
+                <h3 id="recent-searches-heading" class="text-lg font-semibold text-slate-900 dark:text-white mb-4">
+                    Recent Searches
+                </h3>
+                
+                <div id="recent-searches-list" class="space-y-3" role="list" aria-label="Recent PNR searches">
+                    <!-- Recent search items will be populated here -->
+                </div>
+
+                <!-- Empty state for recent searches -->
+                <div id="recent-searches-empty" class="text-center py-8 hidden" role="status" aria-live="polite">
+                    <p class="text-slate-500 dark:text-slate-400">
+                        No recent searches yet
+                    </p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Theme toggle script for testing -->
+    <script>
+        // Simple theme toggle for development/testing
+        function toggleTheme() {
+            document.documentElement.classList.toggle('dark');
+        }
+        
+        // Check for saved theme preference or default to light mode
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+        
+        // Save theme preference
+        function setTheme(theme) {
+            localStorage.theme = theme;
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        }
+
+        // PNR Input functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const pnrInput = document.getElementById('pnr-input');
+            const clearBtn = document.getElementById('clear-btn');
+            const checkStatusBtn = document.getElementById('check-status-btn');
+            const recentSearchesList = document.getElementById('recent-searches-list');
+            const recentSearchesEmpty = document.getElementById('recent-searches-empty');
+
+            // Sample recent searches data (in real app, this would come from localStorage or API)
+            const recentSearches = [
+                '245-5423890',
+                '123-4567890',
+                '987-6543210'
+            ];
+
+            // Show/hide clear button based on input content
+            function toggleClearButton() {
+                if (pnrInput.value.trim()) {
+                    clearBtn.classList.remove('opacity-0', 'invisible');
+                    clearBtn.classList.add('opacity-100', 'visible');
+                } else {
+                    clearBtn.classList.add('opacity-0', 'invisible');
+                    clearBtn.classList.remove('opacity-100', 'visible');
+                }
+            }
+
+            // Render recent searches
+            function renderRecentSearches() {
+                if (recentSearches.length === 0) {
+                    recentSearchesEmpty.classList.remove('hidden');
+                    recentSearchesList.innerHTML = '';
+                    return;
+                }
+
+                recentSearchesEmpty.classList.add('hidden');
+                recentSearchesList.innerHTML = recentSearches.map(pnr => `
+                    <div class="bg-white dark:bg-gray-800 rounded-lg p-4 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors cursor-pointer recent-search-item" data-pnr="${pnr}">
+                        <div class="flex items-center justify-between">
+                            <span class="text-slate-900 dark:text-white font-medium">${pnr}</span>
+                            <span class="material-symbols-outlined text-slate-400 dark:text-slate-500">
+                                arrow_forward
+                            </span>
+                        </div>
+                    </div>
+                `).join('');
+
+                // Add click handlers to recent search items
+                document.querySelectorAll('.recent-search-item').forEach(item => {
+                    item.addEventListener('click', function() {
+                        const pnr = this.dataset.pnr;
+                        pnrInput.value = pnr;
+                        toggleClearButton();
+                        checkStatusBtn.click();
+                    });
+                });
+            }
+
+            // Clear input functionality
+            clearBtn.addEventListener('click', function() {
+                pnrInput.value = '';
+                toggleClearButton();
+                pnrInput.focus();
+            });
+
+            // Input event listener
+            pnrInput.addEventListener('input', toggleClearButton);
+
+            // Form validation and submission
+            checkStatusBtn.addEventListener('click', function() {
+                const pnrValue = pnrInput.value.trim();
+                
+                if (!pnrValue) {
+                    alert('Please enter a PNR number');
+                    return;
+                }
+
+                // Basic PNR format validation (numbers with optional dashes)
+                const pnrPattern = /^[0-9-]+$/;
+                if (!pnrPattern.test(pnrValue)) {
+                    alert('Please enter a valid PNR number (numbers and dashes only)');
+                    return;
+                }
+
+                // Add to recent searches if not already present
+                if (!recentSearches.includes(pnrValue)) {
+                    recentSearches.unshift(pnrValue);
+                    // Keep only last 5 searches
+                    if (recentSearches.length > 5) {
+                        recentSearches.pop();
+                    }
+                    renderRecentSearches();
+                }
+
+                // If validation passes, proceed to status display
+                console.log('Checking status for PNR:', pnrValue);
+                alert('Navigating to status display for PNR: ' + pnrValue);
+            });
+
+            // Enter key submission
+            pnrInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    checkStatusBtn.click();
+                }
+            });
+
+            // Initialize recent searches
+            renderRecentSearches();
+        });
+    </script>
+</body>
+</html>

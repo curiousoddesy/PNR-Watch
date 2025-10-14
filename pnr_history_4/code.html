@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="PNR History - Enhanced view with search and filters">
+    <title>My PNRs - Enhanced</title>
+    
+    <!-- Tailwind CSS with custom configuration -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#137fec',
+                        'background-light': '#f6f7f8',
+                        'background-dark': '#101922'
+                    },
+                    fontFamily: {
+                        sans: ['Public Sans', 'system-ui', 'sans-serif']
+                    },
+                    fontWeight: {
+                        normal: '400',
+                        medium: '500',
+                        semibold: '600',
+                        bold: '700'
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Public Sans Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Material Symbols Font -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body class="font-sans bg-background-light dark:bg-background-dark text-slate-900 dark:text-white antialiased" style="min-height: max(884px, 100dvh);">
+    <!-- Main application container -->
+    <div id="app" class="min-h-full">
+        <!-- Header Component -->
+        <header class="p-4 pb-2 flex items-center justify-between">
+            <!-- Back button -->
+            <button class="flex items-center justify-center w-12 h-12 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
+                <span class="material-symbols-outlined text-slate-700 dark:text-slate-300">
+                    arrow_back
+                </span>
+            </button>
+            
+            <!-- Centered title -->
+            <h1 class="text-lg font-semibold text-slate-900 dark:text-white">
+                My PNRs
+            </h1>
+            
+            <!-- Empty space for balance (same width as back button) -->
+            <div class="w-12 h-12"></div>
+        </header>
+
+        <!-- Search Section -->
+        <div class="px-4 pb-4">
+            <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <span class="material-symbols-outlined text-slate-400">
+                        search
+                    </span>
+                </div>
+                <input 
+                    type="text" 
+                    id="search-input"
+                    class="block w-full pl-10 pr-3 py-3 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-500 dark:placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                    placeholder="Search PNR or status..."
+                >
+            </div>
+        </div>
+
+        <!-- Filter Chips Section -->
+        <div class="px-4 pb-4">
+            <div class="flex flex-wrap gap-2">
+                <!-- Filter Button -->
+                <button 
+                    id="filter-btn"
+                    class="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+                >
+                    <span class="material-symbols-outlined text-sm">
+                        tune
+                    </span>
+                    Filter
+                </button>
+
+                <!-- Active Alerts Filter -->
+                <button 
+                    id="active-alerts-filter"
+                    class="filter-chip px-4 py-2 rounded-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+                    data-filter="active-alerts"
+                >
+                    Active Alerts
+                </button>
+
+                <!-- Confirmed Filter -->
+                <button 
+                    id="confirmed-filter"
+                    class="filter-chip px-4 py-2 rounded-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+                    data-filter="confirmed"
+                >
+                    Confirmed
+                </button>
+
+                <!-- Waiting List Filter -->
+                <button 
+                    id="waitlisted-filter"
+                    class="filter-chip px-4 py-2 rounded-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+                    data-filter="waitlisted"
+                >
+                    Waiting List
+                </button>
+
+                <!-- Date Range Filter -->
+                <button 
+                    id="date-range-filter"
+                    class="filter-chip px-4 py-2 rounded-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+                    data-filter="date-range"
+                >
+                    Date Range
+                </button>
+            </div>
+        </div>
+
+        <!-- Tab Navigation -->
+        <div class="border-b border-slate-200 dark:border-slate-700">
+            <nav class="px-4">
+                <div class="flex space-x-8">
+                    <!-- Saved PNRs Tab (Active) -->
+                    <button 
+                        id="saved-tab"
+                        class="py-3 px-1 border-b-2 border-primary text-primary font-medium text-sm focus:outline-none focus:text-primary transition-colors"
+                        data-tab="saved"
+                    >
+                        Saved PNRs
+                    </button>
+                    
+                    <!-- History Tab -->
+                    <button 
+                        id="history-tab"
+                        class="py-3 px-1 border-b-2 border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 font-medium text-sm focus:outline-none focus:text-slate-700 dark:focus:text-slate-300 transition-colors"
+                        data-tab="history"
+                    >
+                        History
+                    </button>
+                </div>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <main class="px-4 pb-4 pt-4">
+            <!-- Saved PNRs Content -->
+            <div id="saved-content" class="tab-content">
+                <!-- PNR Cards List will be populated here -->
+                <div id="saved-pnr-list" class="space-y-3">
+                    <!-- Sample PNR cards will be added via JavaScript -->
+                </div>
+
+                <!-- Empty state for saved PNRs -->
+                <div id="saved-empty-state" class="text-center py-12 hidden">
+                    <div class="w-16 h-16 mx-auto mb-4 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center">
+                        <span class="material-symbols-outlined text-slate-400 text-2xl">
+                            bookmark_border
+                        </span>
+                    </div>
+                    <h3 class="text-lg font-medium text-slate-900 dark:text-white mb-2">No Saved PNRs</h3>
+                    <p class="text-slate-500 dark:text-slate-400 mb-4">
+                        Save PNRs to get notifications about status changes
+                    </p>
+                    <button class="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+                        Add First PNR
+                    </button>
+                </div>
+
+                <!-- No results state -->
+                <div id="saved-no-results" class="text-center py-12 hidden">
+                    <div class="w-16 h-16 mx-auto mb-4 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center">
+                        <span class="material-symbols-outlined text-slate-400 text-2xl">
+                            search_off
+                        </span>
+                    </div>
+                    <h3 class="text-lg font-medium text-slate-900 dark:text-white mb-2">No Results Found</h3>
+                    <p class="text-slate-500 dark:text-slate-400">
+                        Try adjusting your search or filters
+                    </p>
+                </div>
+            </div>
+
+            <!-- History Content -->
+            <div id="history-content" class="tab-content hidden">
+                <!-- History PNR Cards List will be populated here -->
+                <div id="history-pnr-list" class="space-y-3">
+                    <!-- Sample history cards will be added via JavaScript -->
+                </div>
+
+                <!-- Empty state for history -->
+                <div id="history-empty-state" class="text-center py-12 hidden">
+                    <div class="w-16 h-16 mx-auto mb-4 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center">
+                        <span class="material-symbols-outlined text-slate-400 text-2xl">
+                            history
+                        </span>
+                    </div>
+                    <h3 class="text-lg font-medium text-slate-900 dark:text-white mb-2">No Search History</h3>
+                    <p class="text-slate-500 dark:text-slate-400">
+                        Your PNR search history will appear here
+                    </p>
+                </div>
+
+                <!-- No results state for history -->
+                <div id="history-no-results" class="text-center py-12 hidden">
+                    <div class="w-16 h-16 mx-auto mb-4 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center">
+                        <span class="material-symbols-outlined text-slate-400 text-2xl">
+                            search_off
+                        </span>
+                    </div>
+                    <h3 class="text-lg font-medium text-slate-900 dark:text-white mb-2">No Results Found</h3>
+                    <p class="text-slate-500 dark:text-slate-400">
+                        Try adjusting your search or filters
+                    </p>
+                </div>
+            </div>
+        </main>
+
+        <!-- Floating Add Button -->
+        <button class="fixed bottom-6 right-6 h-14 w-14 bg-primary hover:bg-primary/90 text-white rounded-full shadow-lg flex items-center justify-center transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background-light dark:focus:ring-offset-background-dark">
+            <span class="material-symbols-outlined">
+                add
+            </span>
+        </button>
+    </div>
+
+    <!-- Theme toggle script for testing -->
+    <script>
+        // Simple theme toggle for development/testing
+        function toggleTheme() {
+            document.documentElement.classList.toggle('dark');
+        }
+        
+        // Check for saved theme preference or default to light mode
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+        
+        // Save theme preference
+        function setTheme(theme) {
+            localStorage.theme = theme;
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        }
+
+        // Global state for filters and search
+        let currentFilters = new Set();
+        let currentSearchTerm = '';
+        let allPNRs = {
+            saved: [],
+            history: []
+        };
+
+        // Tab navigation functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedTab = document.getElementById('saved-tab');
+            const historyTab = document.getElementById('history-tab');
+            const savedContent = document.getElementById('saved-content');
+            const historyContent = document.getElementById('history-content');
+            const searchInput = document.getElementById('search-input');
+
+            // Tab switching function
+            function switchTab(activeTab, inactiveTab, activeContent, inactiveContent) {
+                // Update tab styles
+                activeTab.classList.remove('border-transparent', 'text-slate-500', 'dark:text-slate-400');
+                activeTab.classList.add('border-primary', 'text-primary');
+                
+                inactiveTab.classList.remove('border-primary', 'text-primary');
+                inactiveTab.classList.add('border-transparent', 'text-slate-500', 'dark:text-slate-400');
+
+                // Update content visibility
+                activeContent.classList.remove('hidden');
+                inactiveContent.classList.add('hidden');
+
+                // Apply current filters to the new tab
+                applyFiltersAndSearch();
+            }
+
+            // Tab click handlers
+            savedTab.addEventListener('click', function() {
+                switchTab(savedTab, historyTab, savedContent, historyContent);
+            });
+
+            historyTab.addEventListener('click', function() {
+                switchTab(historyTab, savedTab, historyContent, savedContent);
+            });
+
+            // Search functionality
+            searchInput.addEventListener('input', function(e) {
+                currentSearchTerm = e.target.value.toLowerCase();
+                applyFiltersAndSearch();
+            });
+
+            // Filter chip functionality
+            const filterChips = document.querySelectorAll('.filter-chip');
+            filterChips.forEach(chip => {
+                chip.addEventListener('click', function() {
+                    const filter = this.dataset.filter;
+                    toggleFilter(filter, this);
+                });
+            });
+
+            // Initialize with sample data
+            initializeSampleData();
+
+            // Floating add button functionality
+            const addButton = document.querySelector('.fixed.bottom-6');
+            addButton.addEventListener('click', function() {
+                console.log('Add PNR button clicked');
+                alert('Navigating to PNR input screen');
+            });
+        });
+
+        // Toggle filter function
+        function toggleFilter(filter, chipElement) {
+            if (currentFilters.has(filter)) {
+                currentFilters.delete(filter);
+                chipElement.classList.remove('bg-primary', 'text-white', 'border-primary');
+                chipElement.classList.add('bg-white', 'dark:bg-slate-800', 'text-slate-700', 'dark:text-slate-300', 'border-slate-300', 'dark:border-slate-600');
+            } else {
+                currentFilters.add(filter);
+                chipElement.classList.remove('bg-white', 'dark:bg-slate-800', 'text-slate-700', 'dark:text-slate-300', 'border-slate-300', 'dark:border-slate-600');
+                chipElement.classList.add('bg-primary', 'text-white', 'border-primary');
+            }
+            applyFiltersAndSearch();
+        }
+
+        // Apply filters and search
+        function applyFiltersAndSearch() {
+            const activeTab = document.querySelector('[data-tab].border-primary').dataset.tab;
+            const pnrs = allPNRs[activeTab];
+            
+            let filteredPNRs = pnrs.filter(pnr => {
+                // Search filter
+                if (currentSearchTerm) {
+                    const searchMatch = pnr.pnr.toLowerCase().includes(currentSearchTerm) ||
+                                      pnr.status.toLowerCase().includes(currentSearchTerm) ||
+                                      pnr.route.from.toLowerCase().includes(currentSearchTerm) ||
+                                      pnr.route.to.toLowerCase().includes(currentSearchTerm);
+                    if (!searchMatch) return false;
+                }
+
+                // Status filters
+                if (currentFilters.has('confirmed') && pnr.status !== 'confirmed') return false;
+                if (currentFilters.has('waitlisted') && pnr.status !== 'waitlisted') return false;
+                if (currentFilters.has('active-alerts') && !pnr.hasNotifications) return false;
+                
+                // Date range filter (simplified - in real app would show date picker)
+                if (currentFilters.has('date-range')) {
+                    // For demo, filter to show only recent dates
+                    const pnrDate = new Date(pnr.date);
+                    const now = new Date();
+                    const daysDiff = (now - pnrDate) / (1000 * 60 * 60 * 24);
+                    if (daysDiff > 30) return false; // Show only last 30 days
+                }
+
+                return true;
+            });
+
+            const showNotificationSettings = activeTab === 'saved';
+            renderPNRList(
+                `${activeTab}-pnr-list`, 
+                `${activeTab}-empty-state`, 
+                `${activeTab}-no-results`,
+                filteredPNRs, 
+                showNotificationSettings,
+                pnrs.length > 0 // has original data
+            );
+        }
+
+        // Initialize sample data for demonstration
+        function initializeSampleData() {
+            // Sample saved PNRs data
+            allPNRs.saved = [
+                {
+                    pnr: '245-5423890',
+                    status: 'confirmed',
+                    route: { from: 'New Delhi', to: 'Mumbai' },
+                    date: '15 Jul 2024',
+                    hasNotifications: true
+                },
+                {
+                    pnr: '123-4567890',
+                    status: 'waitlisted',
+                    route: { from: 'Chennai', to: 'Bangalore' },
+                    date: '20 Jul 2024',
+                    hasNotifications: true
+                },
+                {
+                    pnr: '789-0123456',
+                    status: 'confirmed',
+                    route: { from: 'Hyderabad', to: 'Pune' },
+                    date: '25 Jul 2024',
+                    hasNotifications: false
+                }
+            ];
+
+            // Sample history data
+            allPNRs.history = [
+                {
+                    pnr: '987-6543210',
+                    status: 'confirmed',
+                    route: { from: 'Kolkata', to: 'Delhi' },
+                    date: '10 Jul 2024',
+                    hasNotifications: false
+                },
+                {
+                    pnr: '456-7890123',
+                    status: 'cancelled',
+                    route: { from: 'Pune', to: 'Goa' },
+                    date: '05 Jul 2024',
+                    hasNotifications: false
+                },
+                {
+                    pnr: '321-6549870',
+                    status: 'waitlisted',
+                    route: { from: 'Jaipur', to: 'Udaipur' },
+                    date: '12 Jul 2024',
+                    hasNotifications: false
+                }
+            ];
+
+            // Initial render
+            applyFiltersAndSearch();
+        }
+
+        // Render PNR list function
+        function renderPNRList(listId, emptyStateId, noResultsId, pnrs, showNotificationSettings, hasOriginalData) {
+            const listElement = document.getElementById(listId);
+            const emptyStateElement = document.getElementById(emptyStateId);
+            const noResultsElement = document.getElementById(noResultsId);
+
+            // Hide all states first
+            emptyStateElement.classList.add('hidden');
+            noResultsElement.classList.add('hidden');
+
+            if (pnrs.length === 0) {
+                if (!hasOriginalData) {
+                    // Show empty state if no original data
+                    emptyStateElement.classList.remove('hidden');
+                } else {
+                    // Show no results if filtered out all results
+                    noResultsElement.classList.remove('hidden');
+                }
+                listElement.innerHTML = '';
+                return;
+            }
+
+            listElement.innerHTML = pnrs.map(pnr => createPNRCard(pnr, showNotificationSettings)).join('');
+        }
+
+        // Create PNR card HTML
+        function createPNRCard(pnr, showNotificationSettings) {
+            const statusColors = {
+                confirmed: { bg: 'bg-green-500', badge: 'bg-green-100 dark:bg-green-900/50 text-green-800 dark:text-green-200' },
+                waitlisted: { bg: 'bg-orange-500', badge: 'bg-orange-100 dark:bg-orange-900/50 text-orange-800 dark:text-orange-200' },
+                cancelled: { bg: 'bg-red-500', badge: 'bg-red-100 dark:bg-red-900/50 text-red-800 dark:text-red-200' }
+            };
+
+            const colors = statusColors[pnr.status] || statusColors.confirmed;
+            const notificationIcon = pnr.hasNotifications ? 'notifications_active' : 'notifications_off';
+            const notificationSettings = showNotificationSettings ? `
+                <button class="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-colors">
+                    <span class="material-symbols-outlined text-lg">settings</span>
+                    Notification Settings
+                </button>
+            ` : '';
+
+            return `
+                <div class="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-4 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
+                    <div class="flex items-start gap-4">
+                        <!-- Status Icon -->
+                        <div class="w-10 h-10 ${colors.bg} rounded-full flex items-center justify-center flex-shrink-0">
+                            <span class="material-symbols-outlined text-white text-lg">
+                                ${pnr.status === 'confirmed' ? 'check_circle' : pnr.status === 'waitlisted' ? 'schedule' : 'cancel'}
+                            </span>
+                        </div>
+
+                        <!-- PNR Details -->
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="font-semibold text-slate-900 dark:text-white">${pnr.pnr}</span>
+                                ${pnr.hasNotifications ? `
+                                    <span class="material-symbols-outlined text-primary text-lg">
+                                        ${notificationIcon}
+                                    </span>
+                                ` : ''}
+                            </div>
+                            
+                            <div class="text-sm text-slate-600 dark:text-slate-400 mb-2">
+                                From: ${pnr.route.from} To: ${pnr.route.to}
+                            </div>
+                            
+                            <div class="flex items-center justify-between">
+                                <div class="text-sm text-slate-500 dark:text-slate-500">
+                                    ${pnr.date}
+                                </div>
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${colors.badge}">
+                                    ${pnr.status.charAt(0).toUpperCase() + pnr.status.slice(1)}
+                                </span>
+                            </div>
+
+                            ${notificationSettings ? `
+                                <div class="mt-3 pt-3 border-t border-slate-200 dark:border-slate-700">
+                                    ${notificationSettings}
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>
