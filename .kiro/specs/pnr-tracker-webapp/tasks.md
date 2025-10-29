@@ -32,7 +32,7 @@
   - Add error handling and retry logic with exponential backoff
   - _Requirements: 3.1, 6.1, 6.3_
 
-- [ ] 2.4 Write unit tests for core PNR services
+- [x] 2.4 Write unit tests for core PNR services
 
   - Test PNR validation logic with various input formats
   - Mock IRCTC responses to test HTML parsing functionality
@@ -190,11 +190,12 @@
   - Test notification pipeline integration
   - _Requirements: 3.1, 4.1, 5.5_
 
-- [ ] 8. Create React frontend application
+- [-] 8. Create React frontend application
 
 - [x] 8.1 Set up React application with routing and state management
 
   - Initialize React application with TypeScript and routing setup
+
   - Configure state management using Context API or Redux Toolkit
   - Set up API client for backend communication
   - _Requirements: 7.1, 7.2_
@@ -207,17 +208,19 @@
   - Create user profile management interface
   - _Requirements: 1.1, 1.2, 1.3, 1.4_
 
-- [ ] 8.3 Build PNR management dashboard
+- [x] 8.3 Build PNR management dashboard
 
   - Create PNR list component displaying tracked PNRs with current status
+
   - Implement add PNR form with validation and error handling
   - Create PNR detail view showing journey information and status history
   - Add PNR removal functionality with confirmation dialogs
   - _Requirements: 2.2, 2.4, 2.5, 3.2, 3.3_
 
-- [ ] 8.4 Implement real-time status updates
+- [x] 8.4 Implement real-time status updates
 
   - Set up WebSocket connection for real-time status updates
+
   - Create status update components that refresh automatically
   - Add loading states and error handling for status checks
   - Implement manual refresh functionality for immediate status checks
@@ -272,10 +275,9 @@
   - Test system monitoring and alerting functionality
   - _Requirements: 6.3, 6.4, 6.5_
 
-- [ ] 10. Final integration and deployment preparation
+- [x] 10. Final integration and deployment preparation
 
 - [x] 10.1 Integrate all components and perform end-to-end testing
-
 
   - Connect frontend and backend with complete API integration
   - Test complete user workflows from registration to PNR tracking

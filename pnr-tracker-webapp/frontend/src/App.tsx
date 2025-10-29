@@ -11,6 +11,7 @@ import { PNRProvider } from './contexts/PNRContext';
 // Components
 import { ProtectedRoute } from './components/common/ProtectedRoute';
 import { Layout } from './components/layout/Layout';
+import { RealTimeNotifications } from './components/common/RealTimeNotifications';
 
 // Pages
 import { Login } from './pages/Login';
@@ -61,6 +62,7 @@ function App() {
         <CssBaseline />
         <AuthProvider>
           <PNRProvider>
+            <RealTimeNotifications />
             <Router>
               <Routes>
                 {/* Public routes */}

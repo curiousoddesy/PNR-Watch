@@ -1,0 +1,129 @@
+name: E2E Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  e2e-tests:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        browser: [chromium, firefox, webkit]
+        
+    steps:
+    - uses: actions/checkout@v4
+    
+    - uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: modern-pnr-frontend/package-lock.json
+    
+    - name: Install dependencies
+      working-directory: modern-pnr-frontend
+      run: npm ci
+    
+    - name: Install Playwright Browsers
+      working-directory: modern-pnr-frontend
+      run: npx playwright install --with-deps ${{ matrix.browser }}
+    
+    - name: Build application
+      working-directory: modern-pnr-frontend
+      run: npm run build
+    
+    - name: Run E2E tests
+      working-directory: modern-pnr-frontend
+      run: npx playwright test --project=${{ matrix.browser }}
+    
+    - name: Upload test results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: playwright-report-${{ matrix.browser }}
+        path: modern-pnr-frontend/playwright-report/
+        retention-days: 30
+    
+    - name: Upload test videos
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: playwright-videos-${{ matrix.browser }}
+        path: modern-pnr-frontend/test-results/
+        retention-days: 30
+
+  accessibility-audit:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: modern-pnr-frontend/package-lock.json
+    
+    - name: Install dependencies
+      working-directory: modern-pnr-frontend
+      run: npm ci
+    
+    - name: Build application
+      working-directory: modern-pnr-frontend
+      run: npm run build
+    
+    - name: Start preview server
+      working-directory: modern-pnr-frontend
+      run: npm run preview &
+    
+    - name: Wait for server
+      run: npx wait-on http://localhost:4173
+    
+    - name: Run accessibility audit
+      working-directory: modern-pnr-frontend
+      run: npx axe-cli http://localhost:4173 --exit
+    
+    - name: Run Lighthouse audit
+      run: |
+        npm install -g @lhci/cli
+        lhci autorun --upload.target=temporary-public-storage
+      env:
+        LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+
+  performance-audit:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: modern-pnr-frontend/package-lock.json
+    
+    - name: Install dependencies
+      working-directory: modern-pnr-frontend
+      run: npm ci
+    
+    - name: Install Playwright
+      working-directory: modern-pnr-frontend
+      run: npx playwright install chromium
+    
+    - name: Build application
+      working-directory: modern-pnr-frontend
+      run: npm run build
+    
+    - name: Run performance tests
+      working-directory: modern-pnr-frontend
+      run: npx playwright test e2e/05-performance-benchmarks.spec.ts
+    
+    - name: Upload performance results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: performance-results
+        path: modern-pnr-frontend/test-results/
+        retention-days: 30

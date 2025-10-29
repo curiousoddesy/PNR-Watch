@@ -1,0 +1,87 @@
+/* React DatePicker Styles */
+@import 'react-datepicker/dist/react-datepicker.css';
+
+/* Custom styles for dark mode and theme integration */
+.react-datepicker {
+  @apply bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg;
+  font-family: inherit;
+}
+
+.react-datepicker__header {
+  @apply bg-gray-50 dark:bg-gray-700 border-b border-gray-300 dark:border-gray-600;
+}
+
+.react-datepicker__current-month {
+  @apply text-gray-900 dark:text-white font-semibold;
+}
+
+.react-datepicker__day-name {
+  @apply text-gray-600 dark:text-gray-400 font-medium;
+}
+
+.react-datepicker__day {
+  @apply text-gray-900 dark:text-white hover:bg-blue-50 dark:hover:bg-blue-900/20;
+}
+
+.react-datepicker__day--selected {
+  @apply bg-blue-600 text-white hover:bg-blue-700;
+}
+
+.react-datepicker__day--today {
+  @apply bg-blue-100 dark:bg-blue-900/30 text-blue-900 dark:text-blue-100 font-semibold;
+}
+
+.react-datepicker__day--keyboard-selected {
+  @apply bg-blue-200 dark:bg-blue-800 text-blue-900 dark:text-blue-100;
+}
+
+.react-datepicker__day--outside-month {
+  @apply text-gray-400 dark:text-gray-600;
+}
+
+.react-datepicker__day--disabled {
+  @apply text-gray-300 dark:text-gray-700 cursor-not-allowed;
+}
+
+.react-datepicker__navigation {
+  @apply text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white;
+}
+
+.react-datepicker__navigation--previous {
+  left: 12px;
+}
+
+.react-datepicker__navigation--next {
+  right: 12px;
+}
+
+.react-datepicker__time-container {
+  @apply border-l border-gray-300 dark:border-gray-600;
+}
+
+.react-datepicker__time-list {
+  @apply bg-white dark:bg-gray-800;
+}
+
+.react-datepicker__time-list-item {
+  @apply text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700;
+}
+
+.react-datepicker__time-list-item--selected {
+  @apply bg-blue-600 text-white;
+}
+
+.react-datepicker__input-container input {
+  @apply w-full;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .react-datepicker {
+    @apply text-sm;
+  }
+  
+  .react-datepicker__day {
+    @apply w-8 h-8 leading-8;
+  }
+}

@@ -1,15 +1,6 @@
 import React from 'react';
-import { Typography, Box } from '@mui/material';
+import { PNRList as PNRListComponent } from '../components/pnr/PNRList';
 
 export const PNRList: React.FC = () => {
-  return (
-    <Box>
-      <Typography variant="h4" component="h1" gutterBottom>
-        My PNRs
-      </Typography>
-      <Typography variant="body1">
-        PNR management interface will be implemented in task 8.3
-      </Typography>
-    </Box>
-  );
+  return <PNRListComponent />;
 };

@@ -1,12 +1,14 @@
-import React, { createContext, useContext, useReducer, ReactNode } from 'react';
+import React, { createContext, useContext, useReducer, ReactNode, useEffect } from 'react';
 import { TrackedPNR, PNRStatusResult } from '../types';
 import { apiClient } from '../services/api';
+import { webSocketService } from '../services/websocket';
 
 interface PNRState {
   pnrs: TrackedPNR[];
   isLoading: boolean;
   error: string | null;
   lastUpdated: string | null;
+  checkingPNRs: Set<string>;
 }
 
 type PNRAction =
@@ -16,6 +18,8 @@ type PNRAction =
   | { type: 'ADD_PNR'; payload: TrackedPNR }
   | { type: 'REMOVE_PNR'; payload: string }
   | { type: 'UPDATE_PNR_STATUS'; payload: { pnrId: string; status: PNRStatusResult } }
+  | { type: 'SET_PNR_CHECKING'; payload: string }
+  | { type: 'SET_PNR_ERROR'; payload: { pnrId: string; error: string } }
   | { type: 'CLEAR_ERROR' };
 
 const initialState: PNRState = {
@@ -23,6 +27,7 @@ const initialState: PNRState = {
   isLoading: false,
   error: null,
   lastUpdated: null,
+  checkingPNRs: new Set(),
 };
 
 const pnrReducer = (state: PNRState, action: PNRAction): PNRState => {
@@ -60,6 +65,8 @@ const pnrReducer = (state: PNRState, action: PNRAction): PNRState => {
         lastUpdated: new Date().toISOString(),
       };
     case 'UPDATE_PNR_STATUS':
+      const newCheckingPNRs = new Set(state.checkingPNRs);
+      newCheckingPNRs.delete(action.payload.pnrId);
       return {
         ...state,
         pnrs: state.pnrs.map(pnr =>
@@ -67,6 +74,32 @@ const pnrReducer = (state: PNRState, action: PNRAction): PNRState => {
             ? { ...pnr, currentStatus: action.payload.status }
             : pnr
         ),
+        checkingPNRs: newCheckingPNRs,
+        lastUpdated: new Date().toISOString(),
+      };
+    case 'SET_PNR_CHECKING':
+      return {
+        ...state,
+        checkingPNRs: new Set(state.checkingPNRs).add(action.payload),
+      };
+    case 'SET_PNR_ERROR':
+      const errorCheckingPNRs = new Set(state.checkingPNRs);
+      errorCheckingPNRs.delete(action.payload.pnrId);
+      return {
+        ...state,
+        pnrs: state.pnrs.map(pnr =>
+          pnr.id === action.payload.pnrId
+            ? { 
+                ...pnr, 
+                currentStatus: { 
+                  ...pnr.currentStatus, 
+                  error: action.payload.error,
+                  lastUpdated: new Date().toISOString()
+                } 
+              }
+            : pnr
+        ),
+        checkingPNRs: errorCheckingPNRs,
         lastUpdated: new Date().toISOString(),
       };
     case 'CLEAR_ERROR':
@@ -96,6 +129,45 @@ interface PNRProviderProps {
 
 export const PNRProvider: React.FC<PNRProviderProps> = ({ children }) => {
   const [state, dispatch] = useReducer(pnrReducer, initialState);
+
+  // Set up WebSocket event listeners
+  useEffect(() => {
+    const handlePNRStatusUpdated = (data: { pnrId: string; status: PNRStatusResult }) => {
+      dispatch({ type: 'UPDATE_PNR_STATUS', payload: data });
+    };
+
+    const handlePNRStatusChecking = (data: { pnrId: string }) => {
+      dispatch({ type: 'SET_PNR_CHECKING', payload: data.pnrId });
+    };
+
+    const handlePNRStatusError = (data: { pnrId: string; error: string }) => {
+      dispatch({ type: 'SET_PNR_ERROR', payload: data });
+    };
+
+    const handlePNRAdded = (data: TrackedPNR) => {
+      dispatch({ type: 'ADD_PNR', payload: data });
+    };
+
+    const handlePNRRemoved = (data: { pnrId: string }) => {
+      dispatch({ type: 'REMOVE_PNR', payload: data.pnrId });
+    };
+
+    // Subscribe to WebSocket events
+    webSocketService.on('pnr-status-updated', handlePNRStatusUpdated);
+    webSocketService.on('pnr-status-checking', handlePNRStatusChecking);
+    webSocketService.on('pnr-status-error', handlePNRStatusError);
+    webSocketService.on('pnr-added', handlePNRAdded);
+    webSocketService.on('pnr-removed', handlePNRRemoved);
+
+    // Cleanup on unmount
+    return () => {
+      webSocketService.off('pnr-status-updated', handlePNRStatusUpdated);
+      webSocketService.off('pnr-status-checking', handlePNRStatusChecking);
+      webSocketService.off('pnr-status-error', handlePNRStatusError);
+      webSocketService.off('pnr-added', handlePNRAdded);
+      webSocketService.off('pnr-removed', handlePNRRemoved);
+    };
+  }, []);
 
   const fetchPNRs = async (): Promise<void> => {
     try {

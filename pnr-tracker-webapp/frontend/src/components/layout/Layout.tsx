@@ -24,6 +24,7 @@ import {
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { ConnectionStatus } from '../common/ConnectionStatus';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -140,6 +141,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
           <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
             Welcome, {user?.name}
           </Typography>
+          <ConnectionStatus />
         </Toolbar>
       </AppBar>
 
