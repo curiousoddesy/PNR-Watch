@@ -26,14 +26,6 @@
 [build.processing.images]
   compress = true
 
-# Enhanced build performance settings
-[build.processing.skip_processing]
-  # Skip processing for already optimized files
-  css = false
-  js = false
-  html = false
-  images = false
-
 # Advanced CDN and performance settings
 [build.environment.performance]
   # Enable advanced compression
