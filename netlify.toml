@@ -59,12 +59,10 @@
   NETLIFY_BUILD_LIFECYCLE_API = "true"
   # Enable build plugins caching
   NETLIFY_BUILD_CACHE_NODE_MODULES = "true"
+  NETLIFY_BUILD_CACHE_FUNCTIONS = "true"
   # Optimize dependency resolution
   NPM_CONFIG_PREFER_OFFLINE = "true"
   NPM_CONFIG_AUDIT = "false"
-  # Build performance optimizations
-  NETLIFY_BUILD_LIFECYCLE_API = "true"
-  NETLIFY_BUILD_CACHE_FUNCTIONS = "true"
   # Optimize build concurrency
   NETLIFY_BUILD_CONCURRENT_FUNCTIONS = "10"
 
