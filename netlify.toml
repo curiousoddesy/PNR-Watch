@@ -330,8 +330,9 @@
   from = "https://www.your-domain.com/*"
   to = "https://your-domain.com/:splat"
   status = 301
-  force = true# Add
-itional performance optimizations for modern assets
+  force = true
+
+# Additional performance optimizations for modern assets
 [[headers]]
   for = "*.mjs"
   [headers.values]
