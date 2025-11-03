@@ -1,0 +1,407 @@
+[build]
+  # Build command using root package.json for better dependency management
+  command = "npm run build"
+  # Publish directory pointing to the frontend build output
+  publish = "modern-pnr-frontend/dist"
+  # Base directory for monorepo structure
+  base = "."
+  # Build performance optimizations
+  ignore = "git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF -- . ':!README.md' ':!docs/'"
+
+# Build processing and optimization
+[build.processing]
+  skip_processing = false
+  
+[build.processing.css]
+  bundle = true
+  minify = true
+  
+[build.processing.js]
+  bundle = true
+  minify = true
+  
+[build.processing.html]
+  pretty_urls = true
+  
+[build.processing.images]
+  compress = true
+
+# Enhanced build performance settings
+[build.processing.skip_processing]
+  # Skip processing for already optimized files
+  css = false
+  js = false
+  html = false
+  images = false
+
+# Advanced CDN and performance settings
+[build.environment.performance]
+  # Enable advanced compression
+  NETLIFY_GZIP_COMPRESSION = "true"
+  NETLIFY_BROTLI_COMPRESSION = "true"
+  # CDN optimization
+  NETLIFY_CDN_CACHE_CONTROL = "max-age=31536000"
+  # Asset optimization
+  NETLIFY_IMAGE_OPTIMIZATION = "true"
+  NETLIFY_ASSET_OPTIMIZATION = "true"
+  
+[build.environment]
+  # Node.js version for build environment
+  NODE_VERSION = "18"
+  NPM_VERSION = "9"
+  # Production environment flag
+  NODE_ENV = "production"
+  # GitHub integration settings
+  NETLIFY_USE_YARN = "false"
+  NETLIFY_USE_PNPM = "false"
+  # Build performance optimizations
+  NODE_OPTIONS = "--max-old-space-size=4096"
+  # Enable build caching
+  NETLIFY_CACHE_NEXTJS = "true"
+  # Optimize npm install
+  NPM_CONFIG_PRODUCTION = "false"
+  NPM_CONFIG_OPTIONAL = "false"
+  # Build parallelization
+  UV_THREADPOOL_SIZE = "128"
+  # Additional performance optimizations
+  NETLIFY_BUILD_LIFECYCLE_API = "true"
+  # Enable build plugins caching
+  NETLIFY_BUILD_CACHE_NODE_MODULES = "true"
+  # Optimize dependency resolution
+  NPM_CONFIG_PREFER_OFFLINE = "true"
+  NPM_CONFIG_AUDIT = "false"
+  # Build performance optimizations
+  NETLIFY_BUILD_LIFECYCLE_API = "true"
+  NETLIFY_BUILD_CACHE_FUNCTIONS = "true"
+  # Optimize build concurrency
+  NETLIFY_BUILD_CONCURRENT_FUNCTIONS = "10"
+
+# Production context settings - triggered on main branch
+[context.production]
+  command = "npm run build:production && npm run deploy:validate"
+  
+[context.production.environment]
+  NODE_ENV = "production"
+  # Enable production optimizations
+  VITE_BUILD_ANALYZE = "false"
+  VITE_BUILD_SOURCEMAP = "false"
+  # Performance optimizations
+  VITE_BUILD_MINIFY = "terser"
+  VITE_BUILD_ROLLUP_TREESHAKE = "true"
+  VITE_BUILD_ROLLUP_EXTERNAL = "true"
+  # Build caching
+  NETLIFY_BUILD_CACHE = "true"
+  # Deployment monitoring
+  NETLIFY_DEPLOYMENT_CONTEXT = "production"
+  # CDN optimization
+  NETLIFY_IMAGES_CDN = "true"
+
+# Deploy preview context for pull requests
+[context.deploy-preview]
+  command = "npm run build && npm run deploy:validate"
+  
+[context.deploy-preview.environment]
+  NODE_ENV = "development"
+  # Enable source maps for debugging in previews
+  VITE_BUILD_SOURCEMAP = "true"
+  # Add preview-specific environment variables
+  VITE_PREVIEW_MODE = "true"
+  # Deployment monitoring
+  NETLIFY_DEPLOYMENT_CONTEXT = "deploy-preview"
+
+# Branch deploy context for feature branches
+[context.branch-deploy]
+  command = "npm run build && npm run deploy:validate"
+  
+[context.branch-deploy.environment]
+  NODE_ENV = "development"
+  VITE_BUILD_SOURCEMAP = "true"
+  # Deployment monitoring
+  NETLIFY_DEPLOYMENT_CONTEXT = "branch-deploy"
+
+# SPA routing - redirect all routes to index.html
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# API proxy redirects (if needed for development)
+[[redirects]]
+  from = "/api/*"
+  to = "https://your-api-domain.com/api/:splat"
+  status = 200
+  force = false
+  condition = "Role=api-user"
+
+# Enhanced security headers for all pages
+[[headers]]
+  for = "/*"
+  [headers.values]
+    # Prevent clickjacking attacks
+    X-Frame-Options = "DENY"
+    # XSS protection (legacy browsers)
+    X-XSS-Protection = "1; mode=block"
+    # Prevent MIME type sniffing
+    X-Content-Type-Options = "nosniff"
+    # Referrer policy for privacy
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    # Enhanced Content Security Policy - Stricter for better security
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; img-src 'self' data: https: blob:; connect-src 'self' https: wss: ws:; media-src 'self' https: data:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests; block-all-mixed-content;"
+    # HTTPS Strict Transport Security with preload (2 years)
+    Strict-Transport-Security = "max-age=63072000; includeSubDomains; preload"
+    # Enhanced Permissions Policy
+    Permissions-Policy = "camera=(), microphone=(), geolocation=(self), payment=(), usb=(), magnetometer=(), gyroscope=(), accelerometer=(), autoplay=(self), encrypted-media=(self), fullscreen=(self), picture-in-picture=(self)"
+    # Cross-Origin policies
+    Cross-Origin-Embedder-Policy = "require-corp"
+    Cross-Origin-Opener-Policy = "same-origin"
+    Cross-Origin-Resource-Policy = "same-origin"
+    # Additional security headers
+    X-Permitted-Cross-Domain-Policies = "none"
+    X-DNS-Prefetch-Control = "off"
+    # Expect-CT header for certificate transparency
+    Expect-CT = "max-age=86400, enforce"
+    # Feature Policy for additional security
+    Feature-Policy = "camera 'none'; microphone 'none'; geolocation 'self'; payment 'none'"
+
+# Aggressive caching for static assets with compression
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+    # Compression and performance headers
+    Vary = "Accept-Encoding"
+    # Enable compression
+    Content-Encoding = "gzip, br"
+    # Preload hints for critical resources
+    Link = "</assets/critical.css>; rel=preload; as=style"
+    # CDN optimization headers
+    X-Accel-Buffering = "no"
+    # Performance timing
+    Server-Timing = "cdn;desc=\"CDN Cache\""
+
+# Enhanced caching for JavaScript files
+[[headers]]
+  for = "*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+    Vary = "Accept-Encoding"
+    Content-Type = "application/javascript; charset=utf-8"
+    # Enable compression
+    Content-Encoding = "gzip, br"
+
+# Enhanced caching for CSS files
+[[headers]]
+  for = "*.css"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+    Vary = "Accept-Encoding"
+    Content-Type = "text/css; charset=utf-8"
+    # Enable compression
+    Content-Encoding = "gzip, br"
+
+# Optimize font loading
+[[headers]]
+  for = "*.woff2"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+    Content-Type = "font/woff2"
+    # Enable cross-origin font loading
+    Access-Control-Allow-Origin = "*"
+
+[[headers]]
+  for = "*.woff"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+    Content-Type = "font/woff"
+    Access-Control-Allow-Origin = "*"
+
+# Optimize image caching
+[[headers]]
+  for = "*.webp"
+  [headers.values]
+    Cache-Control = "public, max-age=2592000"
+    Content-Type = "image/webp"
+    Vary = "Accept"
+
+[[headers]]
+  for = "*.avif"
+  [headers.values]
+    Cache-Control = "public, max-age=2592000"
+    Content-Type = "image/avif"
+    Vary = "Accept"
+
+[[headers]]
+  for = "*.jpg"
+  [headers.values]
+    Cache-Control = "public, max-age=2592000"
+    Content-Type = "image/jpeg"
+
+[[headers]]
+  for = "*.jpeg"
+  [headers.values]
+    Cache-Control = "public, max-age=2592000"
+    Content-Type = "image/jpeg"
+
+# Service worker - no cache to ensure updates
+[[headers]]
+  for = "/sw.js"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+# PWA manifest with security headers
+[[headers]]
+  for = "/manifest.webmanifest"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
+    Content-Type = "application/manifest+json"
+    X-Content-Type-Options = "nosniff"
+
+# API endpoints security (if applicable)
+[[headers]]
+  for = "/api/*"
+  [headers.values]
+    # Prevent caching of API responses
+    Cache-Control = "no-store, no-cache, must-revalidate, proxy-revalidate"
+    Pragma = "no-cache"
+    Expires = "0"
+    # API-specific security headers
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "DENY"
+    # CORS headers (adjust as needed)
+    Access-Control-Allow-Origin = "https://your-domain.com"
+    Access-Control-Allow-Methods = "GET, POST, PUT, DELETE, OPTIONS"
+    Access-Control-Allow-Headers = "Content-Type, Authorization, X-Requested-With"
+    Access-Control-Max-Age = "86400"
+
+# Performance and security headers for HTML files
+[[headers]]
+  for = "*.html"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "DENY"
+    Cache-Control = "public, max-age=0, must-revalidate"
+    # Performance optimization headers
+    Link = "</assets/app.css>; rel=preload; as=style, </assets/app.js>; rel=preload; as=script"
+    # DNS prefetch for external resources
+    X-DNS-Prefetch-Control = "on"
+
+# Performance headers for the main index.html
+[[headers]]
+  for = "/index.html"
+  [headers.values]
+    # Critical resource hints
+    Link = "</assets/critical.css>; rel=preload; as=style; crossorigin, </assets/main.js>; rel=preload; as=script; crossorigin, <https://fonts.googleapis.com>; rel=dns-prefetch, <https://fonts.gstatic.com>; rel=dns-prefetch"
+    # Performance timing
+    Server-Timing = "app;dur=47.2"
+    # Early hints support
+    103 = "Early Hints"
+    # Additional performance optimizations
+    X-Content-Type-Options = "nosniff"
+    # Resource timing
+    Timing-Allow-Origin = "*"
+    # Performance monitoring
+    NEL = "{\"report_to\":\"default\",\"max_age\":31536000,\"include_subdomains\":true}"
+
+# Favicon and icons
+[[headers]]
+  for = "*.ico"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
+
+[[headers]]
+  for = "*.png"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
+
+# Force HTTPS redirects for all HTTP traffic
+[[redirects]]
+  from = "http://netlify.app/*"
+  to = "https://netlify.app/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "http://*.netlify.app/*"
+  to = "https://:host/:splat"
+  status = 301
+  force = true
+
+# Custom domain HTTPS redirects (update with actual domain)
+[[redirects]]
+  from = "http://your-domain.com/*"
+  to = "https://your-domain.com/:splat"
+  status = 301
+  force = true
+
+# Redirect www to non-www for better SEO (optional - update with actual domain)
+[[redirects]]
+  from = "https://www.your-domain.com/*"
+  to = "https://your-domain.com/:splat"
+  status = 301
+  force = true# Add
+itional performance optimizations for modern assets
+[[headers]]
+  for = "*.mjs"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+    Content-Type = "application/javascript; charset=utf-8"
+    Vary = "Accept-Encoding"
+
+# Optimize SVG files
+[[headers]]
+  for = "*.svg"
+  [headers.values]
+    Cache-Control = "public, max-age=2592000"
+    Content-Type = "image/svg+xml"
+    Vary = "Accept-Encoding"
+    # Enable compression for SVG
+    Content-Encoding = "gzip"
+
+# Performance headers for JSON files
+[[headers]]
+  for = "*.json"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
+    Content-Type = "application/json; charset=utf-8"
+    Vary = "Accept-Encoding"
+
+# Optimize video files
+[[headers]]
+  for = "*.mp4"
+  [headers.values]
+    Cache-Control = "public, max-age=2592000"
+    Content-Type = "video/mp4"
+
+[[headers]]
+  for = "*.webm"
+  [headers.values]
+    Cache-Control = "public, max-age=2592000"
+    Content-Type = "video/webm"
+
+# Performance optimization for robots.txt and sitemap
+[[headers]]
+  for = "/robots.txt"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
+    Content-Type = "text/plain"
+
+[[headers]]
+  for = "/sitemap.xml"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
+    Content-Type = "application/xml"
+
+# Additional build performance settings for different contexts
+[context.production.build]
+  # Production-specific build optimizations
+  command = "npm run build:production && npm run deploy:validate"
+  
+[context.production.build.environment]
+  # Enable all production optimizations
+  NETLIFY_BUILD_CACHE = "true"
+  NETLIFY_BUILD_CACHE_NODE_MODULES = "true"
+  NETLIFY_BUILD_CACHE_FUNCTIONS = "true"
+  # Optimize build resources
+  NODE_OPTIONS = "--max-old-space-size=8192"
+  # Enable parallel processing
+  NETLIFY_BUILD_CONCURRENT_FUNCTIONS = "20"
