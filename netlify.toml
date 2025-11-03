@@ -27,16 +27,6 @@
   compress = true
 
 # Advanced CDN and performance settings
-[build.environment.performance]
-  # Enable advanced compression
-  NETLIFY_GZIP_COMPRESSION = "true"
-  NETLIFY_BROTLI_COMPRESSION = "true"
-  # CDN optimization
-  NETLIFY_CDN_CACHE_CONTROL = "max-age=31536000"
-  # Asset optimization
-  NETLIFY_IMAGE_OPTIMIZATION = "true"
-  NETLIFY_ASSET_OPTIMIZATION = "true"
-  
 [build.environment]
   # Node.js version for build environment
   NODE_VERSION = "18"
@@ -65,6 +55,14 @@
   NPM_CONFIG_AUDIT = "false"
   # Optimize build concurrency
   NETLIFY_BUILD_CONCURRENT_FUNCTIONS = "10"
+  # Enable advanced compression
+  NETLIFY_GZIP_COMPRESSION = "true"
+  NETLIFY_BROTLI_COMPRESSION = "true"
+  # CDN optimization
+  NETLIFY_CDN_CACHE_CONTROL = "max-age=31536000"
+  # Asset optimization
+  NETLIFY_IMAGE_OPTIMIZATION = "true"
+  NETLIFY_ASSET_OPTIMIZATION = "true"
 
 # Production context settings - triggered on main branch
 [context.production]
@@ -81,6 +79,12 @@
   VITE_BUILD_ROLLUP_EXTERNAL = "true"
   # Build caching
   NETLIFY_BUILD_CACHE = "true"
+  NETLIFY_BUILD_CACHE_NODE_MODULES = "true"
+  NETLIFY_BUILD_CACHE_FUNCTIONS = "true"
+  # Optimize build resources
+  NODE_OPTIONS = "--max-old-space-size=8192"
+  # Enable parallel processing
+  NETLIFY_BUILD_CONCURRENT_FUNCTIONS = "20"
   # Deployment monitoring
   NETLIFY_DEPLOYMENT_CONTEXT = "production"
   # CDN optimization
@@ -381,18 +385,3 @@
   [headers.values]
     Cache-Control = "public, max-age=86400"
     Content-Type = "application/xml"
-
-# Additional build performance settings for different contexts
-[context.production.build]
-  # Production-specific build optimizations
-  command = "npm run build:production && npm run deploy:validate"
-  
-[context.production.build.environment]
-  # Enable all production optimizations
-  NETLIFY_BUILD_CACHE = "true"
-  NETLIFY_BUILD_CACHE_NODE_MODULES = "true"
-  NETLIFY_BUILD_CACHE_FUNCTIONS = "true"
-  # Optimize build resources
-  NODE_OPTIONS = "--max-old-space-size=8192"
-  # Enable parallel processing
-  NETLIFY_BUILD_CONCURRENT_FUNCTIONS = "20"
