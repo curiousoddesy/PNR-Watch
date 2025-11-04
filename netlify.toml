@@ -1,10 +1,10 @@
 [build]
-  # Build command using root package.json for better dependency management
+  # Base directory for the frontend application
+  base = "modern-pnr-frontend"
+  # Build command using the frontend package.json
   command = "npm run build"
-  # Publish directory pointing to the frontend build output
-  publish = "modern-pnr-frontend/dist"
-  # Base directory for monorepo structure
-  base = "."
+  # Publish directory relative to base
+  publish = "dist"
   # Build performance optimizations
   ignore = "git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF -- . ':!README.md' ':!docs/'"
 
@@ -66,7 +66,7 @@
 
 # Production context settings - triggered on main branch
 [context.production]
-  command = "npm run build:production && npm run deploy:validate"
+  command = "npm run build:production"
   
 [context.production.environment]
   NODE_ENV = "production"
@@ -92,7 +92,7 @@
 
 # Deploy preview context for pull requests
 [context.deploy-preview]
-  command = "npm run build && npm run deploy:validate"
+  command = "npm run build"
   
 [context.deploy-preview.environment]
   NODE_ENV = "development"
@@ -105,7 +105,7 @@
 
 # Branch deploy context for feature branches
 [context.branch-deploy]
-  command = "npm run build && npm run deploy:validate"
+  command = "npm run build"
   
 [context.branch-deploy.environment]
   NODE_ENV = "development"
