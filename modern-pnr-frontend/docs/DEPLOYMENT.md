@@ -374,6 +374,20 @@ add_header Permissions-Policy "geolocation=(), microphone=(), camera=()" always;
 
 ## Troubleshooting
 
+### Known Issues (Fixed)
+
+The following issues were discovered and fixed in commit `27083e1` (March 2026):
+
+#### 1. Infinite postbuild loop
+**Root cause:** `package.json` had `"size-check": "npm run build && node scripts/size-check.js"` and `"postbuild"` called `npm run size-check`, creating a `build → postbuild → size-check → build → ...` infinite loop that timed out on Netlify.
+
+**Fix:** Changed `postbuild` to call `node scripts/size-check.js` directly, bypassing the loop.
+
+#### 2. validate-env.js killed Netlify builds
+**Root cause:** `scripts/validate-env.js` ran as `prebuild` hook. On Netlify, `NODE_ENV=production` and `NETLIFY=true` are auto-set, causing the script to `process.exit(1)` when `VITE_API_URL` etc. were missing — even though **none of those env vars are used in source code** (API base is hardcoded to `/.netlify/functions`).
+
+**Fix:** Replaced `process.exit(1)` with warn-and-continue for all environments.
+
 ### Common Issues
 
 #### Build Failures
