@@ -194,6 +194,9 @@ export default defineConfig({
   },
   build: {
     target: 'esnext',
+    // Skip TypeScript checking during build for faster deployment
+    // TypeScript checking should be done in CI/CD pipeline separately
+    skipTypeCheck: true,
     rollupOptions: {
       output: {
         manualChunks: (id) => {

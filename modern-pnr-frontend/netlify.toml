@@ -3,10 +3,14 @@
   command = "npm run build"
 
 [build.environment]
-  NODE_VERSION = "18"
-  NPM_VERSION = "9"
+  NODE_VERSION = "20"
 
-# Redirect all routes to index.html for SPA routing
+[functions]
+  directory = "netlify/functions"
+
+# API function — no redirect needed, Netlify routes /.netlify/functions/* automatically
+
+# SPA routing — must come AFTER functions
 [[redirects]]
   from = "/*"
   to = "/index.html"
@@ -20,7 +24,6 @@
     X-XSS-Protection = "1; mode=block"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
-    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https: wss:;"
 
 # Cache static assets
 [[headers]]
@@ -33,9 +36,3 @@
   for = "/sw.js"
   [headers.values]
     Cache-Control = "public, max-age=0, must-revalidate"
-
-# Cache manifest
-[[headers]]
-  for = "/manifest.webmanifest"
-  [headers.values]
-    Cache-Control = "public, max-age=86400"
