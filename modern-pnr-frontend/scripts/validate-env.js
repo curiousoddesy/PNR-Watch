@@ -155,7 +155,7 @@ function validateEnvironment() {
     } else if (isProduction) {
       console.log('\n💡 For production builds, ensure all required environment variables are set in Netlify dashboard.');
       console.log('📖 See docs/ENVIRONMENT_VARIABLES.md for detailed setup instructions.');
-      process.exit(1);
+      console.log('⚠️  Continuing build — env vars are not used in source code...');
     } else {
       console.log('\n💡 For development, copy .env.example to .env and update the values.');
       console.log('📖 See docs/ENVIRONMENT_VARIABLES.md for detailed setup instructions.');

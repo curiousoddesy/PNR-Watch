@@ -30,7 +30,7 @@
     "deploy:staging": "node scripts/deploy.js staging",
     "deploy:production": "node scripts/deploy.js production",
     "pre-deploy": "npm run lint && npm run test && npm run security-audit",
-    "postbuild": "node scripts/verify-build.js && npm run size-check"
+    "postbuild": "node scripts/verify-build.js && node scripts/size-check.js"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
