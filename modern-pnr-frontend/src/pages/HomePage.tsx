@@ -6,11 +6,11 @@ import { useThemeContext } from '../contexts/ThemeContext'
 import { cn } from '../utils/cn'
 
 const STATUS_DOT: Record<string, string> = {
-  CNF: 'bg-green-500',
-  RAC: 'bg-amber-500',
-  WL: 'bg-orange-500',
-  PQWL: 'bg-orange-500',
-  CAN: 'bg-red-500',
+  CNF: 'bg-emerald-400',
+  RAC: 'bg-amber-400',
+  WL: 'bg-orange-400',
+  PQWL: 'bg-orange-400',
+  CAN: 'bg-red-400',
 }
 
 export const HomePage: React.FC = () => {
@@ -46,7 +46,6 @@ export const HomePage: React.FC = () => {
     setPnr(value)
   }
 
-  // Format: 123 456 7890
   const formatPNR = (value: string) => {
     if (value.length <= 3) return value
     if (value.length <= 6) return `${value.slice(0, 3)} ${value.slice(3)}`
@@ -59,46 +58,73 @@ export const HomePage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-ground bg-dotgrid flex flex-col">
+    <div className="min-h-screen bg-ground bg-mesh bg-dots flex flex-col relative overflow-hidden">
+
       {/* Header */}
-      <div className="flex items-center justify-between px-6 pt-8">
+      <motion.div
+        initial={{ opacity: 0, y: -8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+        className="relative z-10 flex items-center justify-between px-6 pt-8"
+      >
         <div>
-          <h1 className="font-display font-bold text-xl text-ink tracking-tight leading-none">
-            PNR<span className="text-brand">·</span>WATCH
+          <h1 className="font-display font-extrabold text-[22px] tracking-tight leading-none">
+            <span className="text-brand">PNR</span>
+            <span className="text-ink/15 mx-0.5">/</span>
+            <span className="text-ink">WATCH</span>
           </h1>
-          <div className="h-px w-12 bg-edge mt-1.5" />
+          <div className="flex items-center gap-1.5 mt-1.5">
+            <div className="w-1.5 h-1.5 rounded-full bg-brand animate-signal-pulse" />
+            <span className="text-[10px] font-mono text-ink-muted/50 tracking-[0.2em] uppercase">Live Status</span>
+          </div>
         </div>
 
         <button
           onClick={() => setThemeMode(currentMode === 'dark' ? 'light' : 'dark')}
-          className="w-9 h-9 rounded-full bg-surface border border-edge flex items-center justify-center text-ink-muted hover:text-ink hover:border-ink/20 transition-all"
+          className="w-9 h-9 rounded-xl glass flex items-center justify-center text-ink-muted hover:text-brand transition-colors"
           aria-label="Toggle dark mode"
         >
           {currentMode === 'dark' ? (
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <svg className="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
               <circle cx="12" cy="12" r="5" />
               <path strokeLinecap="round" d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
             </svg>
           ) : (
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <svg className="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M21 12.79A9 9 0 1111.21 3a7 7 0 109.79 9.79z" />
             </svg>
           )}
         </button>
-      </div>
+      </motion.div>
 
       {/* Main — vertically centered */}
-      <div className="flex-1 flex items-center justify-center px-6">
-        <div className="w-full max-w-sm -mt-12">
+      <div className="relative z-10 flex-1 flex items-center justify-center px-6">
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+          className="w-full max-w-sm -mt-8"
+        >
 
           {/* Eyebrow */}
-          <p className="text-center text-xs font-medium tracking-[0.25em] uppercase text-ink-muted/40 mb-6">
-            Indian Railways
-          </p>
+          <div className="flex items-center justify-center gap-3 mb-8">
+            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-edge/60 to-transparent" />
+            <div className="flex items-center gap-2 px-3">
+              <svg className="w-3.5 h-3.5 text-brand/40" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round"
+                  d="M3 17l.01-.011M7 17l.01-.011M11 17l.01-.011M3 13V7a2 2 0 012-2h14a2 2 0 012 2v6M3 13h18M3 13l-1 4h20l-1-4"
+                />
+              </svg>
+              <p className="text-[10px] font-mono font-medium tracking-[0.2em] uppercase text-ink-muted/40">
+                Indian Railways
+              </p>
+            </div>
+            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-edge/60 to-transparent" />
+          </div>
 
-          <form onSubmit={handleSubmit} className="space-y-3">
+          <form onSubmit={handleSubmit} className="space-y-3.5">
             {/* PNR input */}
-            <div className="relative">
+            <div className="relative group">
               <input
                 ref={inputRef}
                 type="text"
@@ -111,14 +137,14 @@ export const HomePage: React.FC = () => {
                 placeholder="Enter PNR number"
                 autoComplete="off"
                 className={cn(
-                  'w-full h-16 px-5 font-mono text-2xl tracking-[0.15em] font-medium',
-                  'bg-surface border-2 rounded-2xl',
-                  'text-ink placeholder:font-sans placeholder:text-base placeholder:tracking-normal',
+                  'w-full h-16 px-5 font-mono text-2xl tracking-[0.15em] font-semibold',
+                  'bg-surface border rounded-2xl text-ink',
+                  'placeholder:font-sans placeholder:text-base placeholder:tracking-normal',
                   'placeholder:font-normal placeholder:text-ink-muted/30',
-                  'focus:outline-none transition-all duration-200',
-                  isFocused || isValid
-                    ? 'border-brand shadow-[0_0_0_4px_rgba(26,86,219,0.08)]'
-                    : 'border-edge'
+                  'focus:outline-none transition-all duration-300',
+                  (isFocused || isValid)
+                    ? 'border-brand/60 glow-signal'
+                    : 'border-edge hover:border-edge/80'
                 )}
               />
 
@@ -130,7 +156,7 @@ export const HomePage: React.FC = () => {
                     exit={{ opacity: 0, scale: 0.7 }}
                     type="button"
                     onClick={() => { setPnr(''); inputRef.current?.focus() }}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-ground flex items-center justify-center text-ink-muted hover:bg-edge transition-all"
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 w-7 h-7 rounded-lg bg-edge/40 flex items-center justify-center text-ink-muted hover:bg-brand/15 hover:text-brand transition-all"
                   >
                     <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -147,12 +173,13 @@ export const HomePage: React.FC = () => {
                   key={i}
                   animate={{
                     backgroundColor: i < pnr.length
-                      ? isValid ? '#16a34a' : '#1a56db'
-                      : '#e2e8f0',
-                    scaleY: i === pnr.length - 1 ? [1, 1.6, 1] : 1,
+                      ? isValid ? 'var(--color-brand)' : 'var(--color-ink-muted)'
+                      : 'var(--color-edge)',
+                    opacity: i < pnr.length ? 1 : 0.5,
+                    scaleY: i === pnr.length - 1 ? [1, 2, 1] : 1,
                   }}
                   transition={{ duration: 0.12 }}
-                  className="h-0.5 rounded-full flex-1 origin-center"
+                  className="h-1 rounded-full flex-1 origin-center"
                 />
               ))}
             </div>
@@ -161,21 +188,29 @@ export const HomePage: React.FC = () => {
             <motion.button
               type="submit"
               disabled={!isValid}
-              animate={{
-                backgroundColor: isValid ? '#1a56db' : '#e2e8f0',
-                color: isValid ? '#ffffff' : '#94a3b8',
-              }}
               whileTap={isValid ? { scale: 0.97 } : undefined}
-              transition={{ duration: 0.2, ease: 'easeOut' }}
               className={cn(
-                'w-full h-14 rounded-xl font-display font-bold tracking-wide text-sm',
-                'transition-shadow duration-300',
+                'w-full h-[52px] rounded-xl font-display font-bold tracking-wide text-sm',
+                'transition-all duration-300 flex items-center justify-center gap-2',
                 isValid
-                  ? 'shadow-[0_4px_24px_rgba(26,86,219,0.28)] hover:shadow-[0_6px_32px_rgba(26,86,219,0.38)]'
-                  : ''
+                  ? 'bg-brand text-ground border-2 border-brand glow-signal-strong hover:brightness-110'
+                  : 'bg-surface text-ink-muted/40 border-2 border-edge cursor-not-allowed'
               )}
             >
-              {isValid ? 'Check Status →' : 'Check Status'}
+              <span>Check Status</span>
+              {isValid && (
+                <motion.svg
+                  initial={{ x: -4, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  className="w-4 h-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2.5}
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </motion.svg>
+              )}
             </motion.button>
           </form>
 
@@ -183,19 +218,17 @@ export const HomePage: React.FC = () => {
           <AnimatePresence>
             {recentQueries.length > 0 && pnr.length === 0 && (
               <motion.div
-                initial={{ opacity: 0, y: 8 }}
+                initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.2 }}
-                className="mt-8"
+                transition={{ duration: 0.25 }}
+                className="mt-10"
               >
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="flex-1 h-px bg-edge" />
-                  <span className="text-xs text-ink-muted/40 font-medium tracking-[0.2em] uppercase">Recent</span>
-                  <div className="flex-1 h-px bg-edge" />
-                </div>
+                <p className="text-[10px] text-ink-muted/30 font-mono font-medium tracking-[0.2em] uppercase mb-3 text-center">
+                  Recent
+                </p>
 
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap justify-center gap-2">
                   {recentQueries.map((recent) => {
                     const status = getRecentStatus(recent)
                     return (
@@ -203,16 +236,15 @@ export const HomePage: React.FC = () => {
                         key={recent}
                         onClick={() => handleRecentClick(recent)}
                         className={cn(
-                          'flex items-center gap-2 px-4 py-2 rounded-xl',
-                          'bg-surface border border-edge',
-                          'hover:border-brand/40 hover:bg-brand/5 hover:shadow-sm',
-                          'transition-all duration-150'
+                          'flex items-center gap-2 px-3.5 py-2 rounded-xl',
+                          'glass hover:border-brand/30',
+                          'transition-all duration-200 group'
                         )}
                       >
                         {status && (
                           <span className={cn('w-1.5 h-1.5 rounded-full flex-shrink-0', STATUS_DOT[status] ?? 'bg-edge')} />
                         )}
-                        <span className="font-mono text-sm text-ink tracking-wider">{recent}</span>
+                        <span className="font-mono text-[13px] text-ink/70 tracking-wider group-hover:text-brand transition-colors">{recent}</span>
                       </button>
                     )
                   })}
@@ -222,25 +254,27 @@ export const HomePage: React.FC = () => {
           </AnimatePresence>
 
           {recentQueries.length === 0 && pnr.length === 0 && (
-            <p className="text-center text-xs text-ink-muted/30 mt-8 tracking-wide">
-              Found on your booking confirmation
-            </p>
+            <div className="text-center mt-10">
+              <p className="text-xs text-ink-muted/25 tracking-wide font-mono">
+                10-digit number from your booking confirmation
+              </p>
+            </div>
           )}
-        </div>
+        </motion.div>
       </div>
 
       {/* QR scan FAB */}
-      <div className="fixed bottom-8 right-6">
+      <div className="fixed bottom-24 right-6 z-20">
         <button
           onClick={() => setShowScanner(true)}
           className={cn(
-            'w-12 h-12 rounded-full bg-surface border border-edge shadow-md',
+            'w-11 h-11 rounded-xl glass shadow-lg',
             'flex items-center justify-center',
-            'hover:shadow-lg hover:border-brand/40 hover:scale-105 transition-all duration-200'
+            'hover:border-brand/40 hover:text-brand hover:glow-signal hover:scale-105 transition-all duration-200'
           )}
           aria-label="Scan QR code"
         >
-          <svg className="w-4 h-4 text-ink-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+          <svg className="w-[18px] h-[18px] text-ink-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
             <path strokeLinecap="round" strokeLinejoin="round"
               d="M3 9V6a3 3 0 013-3h3M3 15v3a3 3 0 003 3h3M15 3h3a3 3 0 013 3v3M15 21h3a3 3 0 003-3v-3M9 9h6v6H9z"
             />
@@ -303,7 +337,7 @@ const QRScannerModal: React.FC<{
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-md"
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
       <motion.div
@@ -311,21 +345,21 @@ const QRScannerModal: React.FC<{
         animate={{ y: 0, opacity: 1 }}
         exit={{ y: 60, opacity: 0 }}
         transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-        className="w-full max-w-md bg-surface rounded-t-3xl sm:rounded-3xl p-6 shadow-2xl"
+        className="w-full max-w-md bg-surface rounded-t-3xl sm:rounded-2xl p-6 shadow-2xl border border-edge"
       >
         <div className="flex items-center justify-between mb-5">
           <h2 className="font-display font-bold text-lg text-ink">Scan QR Code</h2>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-full bg-ground flex items-center justify-center text-ink-muted hover:text-ink transition-colors"
+            className="w-8 h-8 rounded-lg bg-ground flex items-center justify-center text-ink-muted hover:text-brand transition-colors"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
-        <div id="qr-reader" ref={scannerRef} className="w-full rounded-2xl overflow-hidden bg-ground" />
-        <p className="text-xs text-ink-muted/50 text-center mt-4">
+        <div id="qr-reader" ref={scannerRef} className="w-full rounded-xl overflow-hidden bg-ground" />
+        <p className="text-xs text-ink-muted/40 text-center mt-4 font-mono">
           Position the QR code from your booking within the frame
         </p>
       </motion.div>

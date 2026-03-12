@@ -1,56 +1,54 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=Syne:wght@700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Figtree:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  /* Jobs-inspired design tokens — 6 core colors */
-  --color-ink: #0f172a;
-  --color-ink-muted: #64748b;
-  --color-surface: #ffffff;
-  --color-ground: #f1f5f9;
-  --color-edge: #e2e8f0;
-  --color-brand: #1a56db;
+  /* Signal — Light mode */
+  --color-ink: #111827;
+  --color-ink-muted: #6B7280;
+  --color-surface: #FFFFFF;
+  --color-ground: #F5F6FA;
+  --color-edge: #DFE2EB;
+  --color-brand: #16B364;
 
-  /* Status colors — semantic only */
-  --color-status-confirmed: #16a34a;
-  --color-status-rac: #d97706;
-  --color-status-waitlist: #ea580c;
-  --color-status-cancelled: #dc2626;
+  --color-status-confirmed: #059669;
+  --color-status-rac: #D97706;
+  --color-status-waitlist: #EA580C;
+  --color-status-cancelled: #DC2626;
 
-  /* Legacy aliases for existing components */
-  --color-primary: #3b82f6;
-  --color-secondary: #64748b;
+  --color-primary: var(--color-brand);
+  --color-secondary: var(--color-ink-muted);
   --color-background: var(--color-ground);
   --color-text: var(--color-ink);
   --color-text-secondary: var(--color-ink-muted);
   --color-border: var(--color-edge);
-  --color-success: #22c55e;
-  --color-warning: #f59e0b;
-  --color-error: #ef4444;
+  --color-success: #059669;
+  --color-warning: #D97706;
+  --color-error: #DC2626;
 
   --animation-duration: 0.2s;
   --animation-easing: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .dark {
-  --color-ink: #f1f5f9;
-  --color-ink-muted: #94a3b8;
-  --color-surface: #1e293b;
-  --color-ground: #0f172a;
-  --color-edge: #334155;
-  --color-brand: #3b82f6;
+  --color-ink: #E4E8F1;
+  --color-ink-muted: #6A7186;
+  --color-surface: #12161F;
+  --color-ground: #0A0D14;
+  --color-edge: #1C2030;
+  --color-brand: #22D87C;
 
-  --color-primary: #60a5fa;
-  --color-secondary: #94a3b8;
+  --color-primary: var(--color-brand);
+  --color-secondary: var(--color-ink-muted);
   --color-background: var(--color-ground);
   --color-text: var(--color-ink);
   --color-text-secondary: var(--color-ink-muted);
   --color-border: var(--color-edge);
-  --color-success: #4ade80;
-  --color-warning: #fbbf24;
-  --color-error: #f87171;
+  --color-success: #34D399;
+  --color-warning: #FBBF24;
+  --color-error: #F87171;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -65,20 +63,95 @@
 }
 
 body {
-  font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+  font-family: 'Figtree', system-ui, -apple-system, sans-serif;
   line-height: 1.5;
   font-weight: 400;
-  color-scheme: light dark;
+  color-scheme: dark light;
   background-color: var(--color-ground);
   color: var(--color-ink);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Subtle dot-grid background texture */
-.bg-dotgrid {
-  background-image: radial-gradient(circle, var(--color-edge) 1px, transparent 1px);
-  background-size: 28px 28px;
+/* Gradient mesh background — ambient depth */
+.bg-mesh::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 80% 50% at 20% 40%, rgba(34, 216, 124, 0.04) 0%, transparent 70%),
+    radial-gradient(ellipse 60% 40% at 80% 20%, rgba(99, 102, 241, 0.03) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 50% at 50% 80%, rgba(34, 216, 124, 0.02) 0%, transparent 50%);
+}
+
+.dark .bg-mesh::before {
+  background:
+    radial-gradient(ellipse 80% 50% at 20% 40%, rgba(34, 216, 124, 0.06) 0%, transparent 70%),
+    radial-gradient(ellipse 60% 40% at 80% 20%, rgba(99, 102, 241, 0.04) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 50% at 50% 80%, rgba(34, 216, 124, 0.03) 0%, transparent 50%);
+}
+
+/* Subtle dot grid pattern */
+.bg-dots::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.3;
+  background-image: radial-gradient(circle at 1px 1px, var(--color-edge) 0.5px, transparent 0);
+  background-size: 24px 24px;
+}
+
+/* Signal glow — green */
+.glow-signal {
+  box-shadow:
+    0 0 20px rgba(34, 216, 124, 0.15),
+    0 0 60px rgba(34, 216, 124, 0.05);
+}
+
+.glow-signal-strong {
+  box-shadow:
+    0 0 30px rgba(34, 216, 124, 0.25),
+    0 0 80px rgba(34, 216, 124, 0.08);
+}
+
+/* Backwards compat aliases */
+.glow-amber { box-shadow: 0 0 20px rgba(34, 216, 124, 0.15), 0 0 60px rgba(34, 216, 124, 0.05); }
+.glow-amber-strong { box-shadow: 0 0 30px rgba(34, 216, 124, 0.25), 0 0 80px rgba(34, 216, 124, 0.08); }
+
+/* Pulse animation for live indicators */
+@keyframes signal-pulse {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+
+.animate-signal-pulse {
+  animation: signal-pulse 2s ease-in-out infinite;
+}
+
+/* Backwards compat */
+.animate-platform-pulse { animation: signal-pulse 2s ease-in-out infinite; }
+.animate-flicker { animation: none; } /* Removed — brand text is now solid */
+
+/* Smooth fade-in for page load */
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-up {
+  animation: fade-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Glass card surface */
+.glass {
+  background: color-mix(in srgb, var(--color-surface) 70%, transparent);
+  backdrop-filter: blur(16px) saturate(1.2);
+  -webkit-backdrop-filter: blur(16px) saturate(1.2);
+  border: 1px solid color-mix(in srgb, var(--color-edge) 60%, transparent);
 }
 
 /* Screen reader only */
