@@ -11,17 +11,10 @@ export interface SkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 const skeletonVariants = {
-  text: 'h-4 rounded',
+  text: 'h-4 rounded-lg',
   circular: 'rounded-full',
   rectangular: 'rounded-none',
-  rounded: 'rounded-md',
-}
-
-const shimmerVariants = {
-  initial: { x: '-100%' },
-  animate: { 
-    x: '100%'
-  }
+  rounded: 'rounded-2xl',
 }
 
 export const Skeleton: React.FC<SkeletonProps> = ({
@@ -40,31 +33,27 @@ export const Skeleton: React.FC<SkeletonProps> = ({
     ...style,
   }
 
+  const shimmerClass = animate
+    ? 'after:absolute after:inset-0 after:bg-gradient-to-r after:from-transparent after:via-white/20 dark:after:via-white/5 after:to-transparent after:animate-[shimmer_1.5s_ease-in-out_infinite]'
+    : ''
+
   if (variant === 'text' && lines > 1) {
     return (
-      <div className={cn('space-y-2', className)} {...props}>
+      <div className={cn('space-y-2.5', className)} {...props}>
         {Array.from({ length: lines }).map((_, index) => (
           <div
             key={index}
             className={cn(
-              'bg-secondary-200 dark:bg-secondary-700 relative overflow-hidden',
+              'bg-ink/[0.04] dark:bg-white/[0.04] relative overflow-hidden',
               skeletonVariants[variant],
-              index === lines - 1 && 'w-3/4' // Last line is shorter
+              shimmerClass,
+              index === lines - 1 && 'w-3/4'
             )}
             style={{
               height: baseStyles.height,
               width: index === lines - 1 ? '75%' : baseStyles.width,
             }}
-          >
-            {animate && (
-              <motion.div
-                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent dark:via-white/10"
-                variants={shimmerVariants}
-                initial="initial"
-                animate="animate"
-              />
-            )}
-          </div>
+          />
         ))}
       </div>
     )
@@ -73,31 +62,17 @@ export const Skeleton: React.FC<SkeletonProps> = ({
   return (
     <div
       className={cn(
-        'bg-secondary-200 dark:bg-secondary-700 relative overflow-hidden',
+        'bg-ink/[0.04] dark:bg-white/[0.04] relative overflow-hidden',
         skeletonVariants[variant],
+        shimmerClass,
         className
       )}
       style={baseStyles}
       {...props}
-    >
-      {animate && (
-        <motion.div
-          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent dark:via-white/10"
-          variants={shimmerVariants}
-          initial="initial"
-          animate="animate"
-          transition={{
-            repeat: Infinity,
-            duration: 1.5,
-            ease: 'linear'
-          }}
-        />
-      )}
-    </div>
+    />
   )
 }
 
-// Predefined skeleton components for common use cases
 export const SkeletonText: React.FC<Omit<SkeletonProps, 'variant'>> = (props) => (
   <Skeleton variant="text" {...props} />
 )
@@ -107,7 +82,7 @@ export const SkeletonCircle: React.FC<Omit<SkeletonProps, 'variant'>> = (props) 
 )
 
 export const SkeletonCard: React.FC<{ className?: string }> = ({ className }) => (
-  <div className={cn('p-4 space-y-3', className)}>
+  <div className={cn('glass rounded-3xl p-5 space-y-3', className)}>
     <div className="flex items-center space-x-3">
       <SkeletonCircle width={40} height={40} />
       <div className="flex-1 space-y-2">
@@ -116,53 +91,50 @@ export const SkeletonCard: React.FC<{ className?: string }> = ({ className }) =>
       </div>
     </div>
     <SkeletonText lines={3} />
-    <div className="flex justify-between">
-      <Skeleton width={80} height={32} className="rounded-md" />
-      <Skeleton width={60} height={32} className="rounded-md" />
+    <div className="flex justify-between pt-2">
+      <Skeleton width={80} height={36} className="rounded-2xl" />
+      <Skeleton width={60} height={36} className="rounded-2xl" />
     </div>
   </div>
 )
 
-export const SkeletonList: React.FC<{ 
+export const SkeletonList: React.FC<{
   items?: number
   showAvatar?: boolean
-  className?: string 
-}> = ({ 
-  items = 3, 
-  showAvatar = true, 
-  className 
+  className?: string
+}> = ({
+  items = 3,
+  showAvatar = true,
+  className
 }) => (
-  <div className={cn('space-y-4', className)}>
+  <div className={cn('space-y-3', className)}>
     {Array.from({ length: items }).map((_, index) => (
-      <div key={index} className="flex items-center space-x-3">
-        {showAvatar && <SkeletonCircle width={32} height={32} />}
+      <div key={index} className="glass rounded-3xl p-4 flex items-center space-x-3">
+        {showAvatar && <SkeletonCircle width={36} height={36} />}
         <div className="flex-1 space-y-2">
           <SkeletonText width="80%" />
-          <SkeletonText width="60%" />
+          <SkeletonText width="55%" />
         </div>
       </div>
     ))}
   </div>
 )
 
-export const SkeletonTable: React.FC<{ 
+export const SkeletonTable: React.FC<{
   rows?: number
   columns?: number
-  className?: string 
-}> = ({ 
-  rows = 5, 
-  columns = 4, 
-  className 
+  className?: string
+}> = ({
+  rows = 5,
+  columns = 4,
+  className
 }) => (
-  <div className={cn('space-y-3', className)}>
-    {/* Header */}
+  <div className={cn('glass rounded-3xl p-5 space-y-3', className)}>
     <div className="grid gap-4" style={{ gridTemplateColumns: `repeat(${columns}, 1fr)` }}>
       {Array.from({ length: columns }).map((_, index) => (
         <SkeletonText key={index} width="70%" />
       ))}
     </div>
-    
-    {/* Rows */}
     {Array.from({ length: rows }).map((_, rowIndex) => (
       <div key={rowIndex} className="grid gap-4" style={{ gridTemplateColumns: `repeat(${columns}, 1fr)` }}>
         {Array.from({ length: columns }).map((_, colIndex) => (

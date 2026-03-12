@@ -10,9 +10,14 @@ export interface CardProps extends HTMLMotionProps<'div'> {
 }
 
 const cardVariants = {
-  default: 'bg-white dark:bg-secondary-800 shadow-sm',
-  elevated: 'bg-white dark:bg-secondary-800 shadow-lg',
-  outlined: 'bg-white dark:bg-secondary-800 border border-secondary-200 dark:border-secondary-700',
+  default: 'glass',
+  elevated: 'glass-heavy',
+  outlined: [
+    'bg-transparent',
+    'border border-ink/[0.06] dark:border-white/[0.06]',
+    'shadow-[inset_0_1px_0_rgba(255,255,255,0.4)]',
+    'dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]',
+  ].join(' '),
   ghost: 'bg-transparent',
 }
 
@@ -24,42 +29,23 @@ const cardPadding = {
   xl: 'p-8',
 }
 
-const cardHoverVariants = {
-  rest: { 
-    scale: 1, 
-    y: 0,
-    boxShadow: '0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)'
-  },
-  hover: { 
-    scale: 1.02, 
-    y: -2,
-    boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)'
-  },
-  tap: { 
-    scale: 0.98, 
-    y: 0 
-  }
-}
-
 export const Card = React.forwardRef<HTMLDivElement, CardProps>(
-  ({ 
-    variant = 'default', 
-    padding = 'md', 
-    hoverable = false, 
-    children, 
+  ({
+    variant = 'default',
+    padding = 'md',
+    hoverable = false,
+    children,
     className,
-    ...props 
+    ...props
   }, ref) => {
     return (
       <motion.div
         ref={ref}
-        variants={hoverable ? cardHoverVariants : undefined}
-        initial="rest"
-        whileHover={hoverable ? "hover" : undefined}
-        whileTap={hoverable ? "tap" : undefined}
-        transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+        whileHover={hoverable ? { scale: 1.01, y: -2 } : undefined}
+        whileTap={hoverable ? { scale: 0.98 } : undefined}
+        transition={{ type: 'spring', stiffness: 400, damping: 20 }}
         className={cn(
-          'rounded-lg transition-colors',
+          'rounded-3xl relative overflow-hidden transition-all',
           cardVariants[variant],
           cardPadding[padding],
           hoverable && 'cursor-pointer',
@@ -67,7 +53,13 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>(
         )}
         {...props}
       >
-        {children}
+        {/* Top specular highlight */}
+        {(variant === 'default' || variant === 'elevated') && (
+          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent dark:via-white/8 pointer-events-none" />
+        )}
+        <div className="relative">
+          {children}
+        </div>
       </motion.div>
     )
   }
@@ -79,7 +71,7 @@ export const CardHeader = React.forwardRef<HTMLDivElement, React.HTMLAttributes<
   ({ className, ...props }, ref) => (
     <div
       ref={ref}
-      className={cn('flex flex-col space-y-1.5 pb-4', className)}
+      className={cn('flex flex-col space-y-1 pb-3', className)}
       {...props}
     />
   )
@@ -90,7 +82,7 @@ export const CardTitle = React.forwardRef<HTMLParagraphElement, React.HTMLAttrib
   ({ className, ...props }, ref) => (
     <h3
       ref={ref}
-      className={cn('text-lg font-semibold leading-none tracking-tight text-secondary-900 dark:text-secondary-100', className)}
+      className={cn('text-[17px] font-display font-bold leading-tight text-ink', className)}
       {...props}
     />
   )
@@ -101,7 +93,7 @@ export const CardDescription = React.forwardRef<HTMLParagraphElement, React.HTML
   ({ className, ...props }, ref) => (
     <p
       ref={ref}
-      className={cn('text-sm text-secondary-600 dark:text-secondary-400', className)}
+      className={cn('text-[14px] text-ink-muted/60', className)}
       {...props}
     />
   )
@@ -119,7 +111,7 @@ export const CardFooter = React.forwardRef<HTMLDivElement, React.HTMLAttributes<
   ({ className, ...props }, ref) => (
     <div
       ref={ref}
-      className={cn('flex items-center pt-4', className)}
+      className={cn('flex items-center pt-3 border-t border-ink/[0.04] dark:border-white/[0.04]', className)}
       {...props}
     />
   )
