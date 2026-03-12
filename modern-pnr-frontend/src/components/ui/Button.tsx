@@ -46,20 +46,20 @@ const buttonVariants = {
 }
 
 const buttonSizes = {
-  sm: 'px-3.5 py-1.5 text-[13px] font-medium rounded-xl',
-  md: 'px-5 py-2.5 text-[14px] font-semibold rounded-2xl',
-  lg: 'px-6 py-3 text-[15px] font-semibold rounded-2xl',
-  xl: 'px-8 py-4 text-[16px] font-semibold rounded-2xl',
+  sm: 'h-8 px-3 text-[12px] font-medium rounded-lg',
+  md: 'h-9 px-4 text-[13px] font-semibold rounded-xl',
+  lg: 'h-10 px-5 text-[14px] font-semibold rounded-xl',
+  xl: 'h-12 px-6 text-[15px] font-semibold rounded-2xl',
 }
 
 const LoadingSpinner = ({ size }: { size: ButtonProps['size'] }) => {
   const prefersReducedMotion = useReducedMotion()
 
   const spinnerSize = {
-    sm: 'w-3.5 h-3.5',
-    md: 'w-4 h-4',
-    lg: 'w-[18px] h-[18px]',
-    xl: 'w-5 h-5',
+    sm: 'w-3 h-3',
+    md: 'w-3.5 h-3.5',
+    lg: 'w-4 h-4',
+    xl: 'w-4 h-4',
   }[size || 'md']
 
   return (

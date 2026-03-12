@@ -1,0 +1,48 @@
+{
+  "name": "pnr-tracker-monorepo",
+  "version": "1.0.0",
+  "description": "PNR Tracker application with modern frontend and backend services",
+  "private": true,
+  "scripts": {
+    "build": "cd modern-pnr-frontend && npm ci && npm run build",
+    "build:production": "cd modern-pnr-frontend && npm ci && npm run build:production",
+    "build:analyze": "cd modern-pnr-frontend && npm ci && npm run build:analyze",
+    "dev": "cd modern-pnr-frontend && npm run dev",
+    "preview": "cd modern-pnr-frontend && npm run preview",
+    "test": "cd modern-pnr-frontend && npm run test",
+    "test:e2e": "cd modern-pnr-frontend && npm run test:e2e",
+    "lint": "cd modern-pnr-frontend && npm run lint",
+    "lint:fix": "cd modern-pnr-frontend && npm run lint:fix",
+    "pre-deploy": "cd modern-pnr-frontend && npm run pre-deploy",
+    "postbuild": "cd modern-pnr-frontend && npm run postbuild",
+    "deploy:monitor": "node scripts/deployment-monitor.js",
+    "deploy:validate": "node scripts/deployment-monitor.js validate",
+    "deploy:status": "node scripts/deployment-monitor.js status",
+    "deploy:stats": "node scripts/deployment-monitor.js stats",
+    "build:failure-analyze": "node scripts/build-failure-handler.js analyze",
+    "build:failure-stats": "node scripts/build-failure-handler.js stats"
+  },
+  "workspaces": [
+    "modern-pnr-frontend",
+    "check-pnr-status"
+  ],
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/your-username/pnr-tracker.git"
+  },
+  "keywords": [
+    "pnr",
+    "tracker",
+    "railway",
+    "travel",
+    "react",
+    "vite",
+    "netlify"
+  ],
+  "author": "Your Name",
+  "license": "MIT"
+}

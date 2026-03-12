@@ -1,5 +1,5 @@
 import React from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card'
+import { motion } from 'framer-motion'
 import { cn } from '../../utils/cn'
 import { PNR } from '../../types'
 
@@ -10,109 +10,101 @@ interface PNRCardProps {
   className?: string
 }
 
-const statusColors: Record<string, string> = {
-  'CNF': 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
-  'RAC': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
-  'WL': 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200',
-  'CAN': 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
-  'PQWL': 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
-  'RLWL': 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200',
+const statusThemes: Record<string, { bg: string, text: string, dot: string }> = {
+  'CNF': { bg: 'bg-green-500/10', text: 'text-green-600 dark:text-green-400', dot: 'bg-green-500' },
+  'RAC': { bg: 'bg-amber-500/10', text: 'text-amber-600 dark:text-amber-400', dot: 'bg-amber-500' },
+  'WL': { bg: 'bg-orange-500/10', text: 'text-orange-600 dark:text-orange-400', dot: 'bg-orange-500' },
+  'PQWL': { bg: 'bg-orange-500/10', text: 'text-orange-600 dark:text-orange-400', dot: 'bg-orange-500' },
+  'CAN': { bg: 'bg-red-500/10', text: 'text-red-600 dark:text-red-400', dot: 'bg-red-500' },
+  'Unknown': { bg: 'bg-ink/5', text: 'text-ink-muted', dot: 'bg-ink/20' }
 }
-
-const getStatusColor = (status: string) =>
-  statusColors[status] || 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'
 
 const formatDate = (dateString: string) =>
   new Date(dateString).toLocaleDateString('en-US', {
-    day: '2-digit', month: 'short', year: 'numeric'
+    day: '2-digit', month: 'short'
   })
 
 export const PNRCard: React.FC<PNRCardProps> = ({ pnr, onClick, onDelete, className }) => {
+  const status = pnr.status.currentStatus
+  const theme = statusThemes[status] || statusThemes.Unknown
+
   return (
-    <Card
-      hoverable
-      className={cn('cursor-pointer', className)}
+    <motion.div
+      whileHover={{ y: -4, scale: 1.01 }}
+      whileTap={{ scale: 0.98 }}
+      className={cn(
+        'group relative glass-heavy rounded-[32px] p-6 cursor-pointer overflow-hidden transition-all duration-300',
+        className
+      )}
       onClick={onClick}
     >
-      <CardHeader className="pb-3">
-        <div className="flex items-start justify-between">
-          <div>
-            <CardTitle className="text-lg font-semibold">
-              PNR: {pnr.number}
-            </CardTitle>
-            <p className="text-sm text-secondary-600 dark:text-secondary-400">
-              {pnr.passengerName}
-            </p>
+      {/* Premium Shimmer Effect */}
+      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none">
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out" />
+      </div>
+
+      <div className="relative z-10">
+        <div className="flex items-start justify-between mb-6">
+          <div className="space-y-1">
+            <p className="text-[10px] text-ink-muted/30 font-bold tracking-[0.2em] uppercase">PNR Number</p>
+            <h3 className="text-xl font-mono font-bold text-ink tracking-widest">{pnr.number}</h3>
           </div>
-          <div className="flex items-center gap-2">
-            <span className={cn(
-              'px-2 py-1 text-xs font-medium rounded-full',
-              getStatusColor(pnr.status.currentStatus)
-            )}>
-              {pnr.status.currentStatus}
+          <div className={cn('flex items-center gap-2 px-3 py-1.5 rounded-2xl border border-white/10', theme.bg)}>
+            <div className={cn('w-1.5 h-1.5 rounded-full', theme.dot)} />
+            <span className={cn('text-[10px] font-black uppercase tracking-widest', theme.text)}>
+              {status}
             </span>
-            {onDelete && (
-              <button
-                onClick={(e) => { e.stopPropagation(); onDelete(pnr.id) }}
-                className="p-1 text-secondary-400 hover:text-red-500 transition-colors"
-                aria-label="Delete PNR"
-              >
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            )}
           </div>
         </div>
-      </CardHeader>
 
-      <CardContent className="space-y-3">
-        <div className="flex items-center gap-2 text-sm">
-          <span className="font-medium">{pnr.trainNumber}</span>
-          <span className="text-secondary-600 dark:text-secondary-400">{pnr.trainName}</span>
-        </div>
+        <div className="flex items-center justify-between mb-8">
+          <div className="text-left">
+            <h4 className="text-lg font-display font-black text-ink leading-none mb-1">{pnr.from}</h4>
+            <p className="text-[10px] text-ink-muted/40 font-bold uppercase tracking-wider">{formatDate(pnr.dateOfJourney)}</p>
+          </div>
 
-        <div className="flex items-center justify-between text-sm">
-          <span className="font-medium">{pnr.from}</span>
-          <div className="flex-1 mx-3 border-t border-dashed border-secondary-300 dark:border-secondary-600" />
-          <span className="font-medium">{pnr.to}</span>
-        </div>
-
-        <div className="flex items-center justify-between text-sm text-secondary-600 dark:text-secondary-400">
-          <span>{formatDate(pnr.dateOfJourney)}</span>
-          <span className="bg-secondary-100 dark:bg-secondary-700 px-2 py-1 rounded text-xs">
-            {pnr.class}
-          </span>
-        </div>
-
-        {pnr.status.passengers.length > 0 && (
-          <div className="pt-2 border-t border-secondary-200 dark:border-secondary-700">
-            <div className="text-xs text-secondary-500 mb-1">
-              {pnr.status.passengers.length} Passenger{pnr.status.passengers.length > 1 ? 's' : ''}
+          <div className="flex flex-col items-center gap-1.5 px-4 flex-1">
+            <div className="relative w-full flex items-center justify-center">
+              <div className="h-[1px] w-full bg-ink/[0.06] rounded-full" />
+              <svg className="absolute w-3 h-3 text-ink-muted/20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
             </div>
-            {pnr.status.passengers.slice(0, 2).map((passenger, i) => (
-              <div key={i} className="flex items-center justify-between text-xs">
-                <span className="text-secondary-700 dark:text-secondary-300">
-                  {passenger.name} ({passenger.age}{passenger.gender})
-                </span>
-                <span className={cn('px-1.5 py-0.5 rounded', getStatusColor(passenger.currentStatus))}>
-                  {passenger.currentStatus}
-                  {passenger.seatNumber && ` - ${passenger.seatNumber}`}
-                </span>
-              </div>
-            ))}
+            <span className="text-[9px] font-bold text-ink-muted/20 uppercase tracking-[0.2em]">Live Status</span>
           </div>
-        )}
 
-        {pnr.status.chartPrepared && (
-          <div className="text-xs text-green-600 dark:text-green-400 flex items-center gap-1">
-            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-            </svg>
-            Chart Prepared
+          <div className="text-right">
+            <h4 className="text-lg font-display font-black text-ink leading-none mb-1">{pnr.to}</h4>
+            <p className="text-[10px] text-ink-muted/40 font-bold uppercase tracking-wider">{pnr.class}</p>
           </div>
-        )}
-      </CardContent>
-    </Card>
+        </div>
+
+        <div className="flex items-center justify-between pt-5 border-t border-ink/[0.04]">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-brand/5 flex items-center justify-center text-brand">
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3 17l.01-.011M7 17l.01-.011M11 17l.01-.011M3 13V7a2 2 0 012-2h14a2 2 0 012 2v6M3 13h18M3 13l-1 4h20l-1-4" />
+              </svg>
+            </div>
+            <div className="text-left">
+              <p className="text-[13px] font-bold text-ink leading-tight">{pnr.trainName}</p>
+              <p className="font-mono text-[10px] text-brand font-bold uppercase tracking-wider mt-0.5">{pnr.trainNumber}</p>
+            </div>
+          </div>
+
+          {onDelete && (
+            <button
+              onClick={(e) => { e.stopPropagation(); onDelete(pnr.id) }}
+              className="w-9 h-9 rounded-xl flex items-center justify-center text-ink-muted/20 hover:text-red-500 hover:bg-red-500/5 transition-all"
+              aria-label="Delete PNR"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          )}
+        </div>
+      </div>
+    </motion.div>
   )
 }

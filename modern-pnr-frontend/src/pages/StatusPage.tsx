@@ -127,192 +127,202 @@ export const StatusPage: React.FC = () => {
         {/* Main content */}
         <AnimatePresence>
           {pnrData && status && !isLoading && (
-            <>
-              {/* Status stamp — colored tinted glass */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="space-y-6"
+            >
+              {/* Status Header — Premium Ticket Stamp */}
               <motion.div
-                initial={{ opacity: 0, scale: 0.92, y: 12 }}
+                initial={{ opacity: 0, scale: 0.95, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
-                transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-                className="glass-tinted rounded-3xl overflow-hidden relative"
+                transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+                className="relative glass-tinted rounded-[40px] overflow-hidden"
                 style={{
-                  background: cfg.bg,
+                  background: `linear-gradient(135deg, ${cfg.bg} 0%, ${cfg.borderColor} 100%)`,
                   ['--tint-glow' as any]: cfg.tintGlow,
                 }}
               >
-                {/* Specular highlight overlay */}
-                <div className="absolute inset-0 rounded-3xl pointer-events-none"
-                  style={{
-                    background: 'linear-gradient(180deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.05) 40%, transparent 60%)',
-                  }}
-                />
-                <div className="relative py-9 px-6 text-center">
+                {/* Visual texture & Highlights */}
+                <div className="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_50%_-20%,#fff,transparent)]" />
+                <div className="absolute top-0 left-0 right-0 h-px bg-white/40" />
+
+                <div className="relative py-12 px-8 text-center">
                   <motion.div
-                    initial={{ opacity: 0, y: 8 }}
+                    initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.15, duration: 0.4 }}
+                    transition={{ delay: 0.2 }}
                   >
-                    <p className="text-white/50 text-[11px] font-medium tracking-[0.25em] uppercase mb-2">
-                      Booking Status
+                    <p className="text-white/40 text-[10px] font-bold tracking-[0.3em] uppercase mb-3">
+                      Current Status
                     </p>
-                    <p className="text-white font-display font-bold leading-none drop-shadow-[0_2px_4px_rgba(0,0,0,0.15)]"
-                      style={{ fontSize: 'clamp(2.5rem, 9vw, 3.5rem)', letterSpacing: '0.02em' }}
+                    <h2 className="text-white font-display font-black leading-none drop-shadow-2xl"
+                      style={{ fontSize: 'clamp(3rem, 12vw, 4.5rem)', letterSpacing: '-0.02em' }}
                     >
                       {cfg.fullLabel}
-                    </p>
+                    </h2>
+
                     {status.chartPrepared && (
-                      <motion.div
-                        initial={{ opacity: 0, width: 0 }}
-                        animate={{ opacity: 1, width: 'auto' }}
-                        transition={{ delay: 0.4 }}
-                        className="inline-flex items-center gap-2 mt-3 px-3 py-1 rounded-full bg-white/15 backdrop-blur-sm"
-                      >
-                        <div className="w-[5px] h-[5px] rounded-full bg-white/80 animate-signal-pulse" />
-                        <span className="text-white/70 text-[11px] font-medium tracking-widest uppercase">Chart Prepared</span>
-                      </motion.div>
+                      <div className="mt-6 inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20">
+                        <span className="relative flex h-2 w-2">
+                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+                          <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
+                        </span>
+                        <span className="text-white text-[10px] font-bold tracking-[0.15em] uppercase">Final Chart Ready</span>
+                      </div>
                     )}
                   </motion.div>
                 </div>
+
+                {/* Ticket "Cut" detail */}
+                <div className="absolute -bottom-4 left-0 right-0 flex justify-between px-10">
+                  <div className="w-8 h-8 rounded-full bg-ground" />
+                  <div className="w-8 h-8 rounded-full bg-ground" />
+                </div>
               </motion.div>
 
-              {/* Journey card — liquid glass */}
+              {/* Journey Details — Visual Track */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.12, duration: 0.5 }}
-                className="glass-heavy rounded-3xl overflow-hidden"
+                transition={{ delay: 0.2, duration: 0.6 }}
+                className="glass-heavy rounded-[32px] p-8"
               >
-                {/* Train info */}
-                <div className="px-6 pt-6 pb-4">
-                  <p className="text-[11px] text-ink-muted/40 font-medium tracking-widest uppercase mb-1">Train</p>
-                  <p className="text-ink font-display font-bold text-lg leading-snug">
-                    <span className="font-mono text-brand">{pnrData.trainNumber}</span>
-                    <span className="text-ink/10 mx-2">|</span>
-                    <span className="text-ink/70">{pnrData.trainName}</span>
-                  </p>
-                </div>
-
-                <Divider />
-
-                {/* Route */}
-                <div className="px-6 py-5">
-                  <div className="flex items-center gap-2">
-                    <div className="flex-1">
-                      <p className="text-[11px] text-ink-muted/40 font-medium tracking-widest uppercase mb-1">From</p>
-                      <p className="text-ink font-display font-bold text-xl leading-tight">{pnrData.from}</p>
-                      {status.trainInfo.departureTime && (
-                        <p className="font-mono text-[13px] text-brand/60 mt-1">{status.trainInfo.departureTime}</p>
-                      )}
-                    </div>
-
-                    <div className="flex flex-col items-center gap-1 flex-shrink-0 px-3">
-                      <div className="flex items-center gap-1 text-ink-muted/20">
-                        <div className="w-6 border-t border-dashed border-current" />
-                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14M12 5l7 7-7 7" />
-                        </svg>
-                      </div>
-                      {status.trainInfo.duration && (
-                        <p className="font-mono text-[10px] text-ink-muted/25 whitespace-nowrap">{status.trainInfo.duration}</p>
-                      )}
-                    </div>
-
-                    <div className="flex-1 text-right">
-                      <p className="text-[11px] text-ink-muted/40 font-medium tracking-widest uppercase mb-1">To</p>
-                      <p className="text-ink font-display font-bold text-xl leading-tight">{pnrData.to}</p>
-                      {status.trainInfo.arrivalTime && (
-                        <p className="font-mono text-[13px] text-brand/60 mt-1">{status.trainInfo.arrivalTime}</p>
-                      )}
-                    </div>
+                <div className="flex items-center justify-between mb-10">
+                  <div className="text-left">
+                    <p className="text-[10px] text-ink-muted/30 font-bold tracking-widest uppercase mb-2">From</p>
+                    <h3 className="text-2xl font-display font-black text-ink leading-none">{pnrData.from}</h3>
+                    <p className="font-mono text-[14px] text-brand font-bold mt-2">{status.trainInfo.departureTime || '--:--'}</p>
                   </div>
 
-                  {/* Journey chips — glass pill badges */}
-                  <div className="flex items-center gap-2 mt-5">
-                    <span className="text-[12px] font-medium text-ink-muted/50 px-3 py-1 rounded-xl bg-ink/[0.04]">{pnrData.dateOfJourney}</span>
-                    {pnrData.class !== '—' && (
-                      <span className="text-[12px] font-medium text-ink-muted/50 px-3 py-1 rounded-xl bg-ink/[0.04] uppercase">{pnrData.class}</span>
-                    )}
+                  <div className="flex-1 px-6 flex flex-col items-center gap-3">
+                    <div className="relative w-full flex items-center">
+                      <div className="h-[2px] w-full bg-ink/[0.06] rounded-full" />
+                      <motion.div
+                        initial={{ left: 0 }}
+                        animate={{ left: '60%' }}
+                        transition={{ duration: 1.5, ease: 'easeInOut' }}
+                        className="absolute w-2 h-2 rounded-full bg-brand shadow-[0_0_12px_rgba(0,122,255,0.6)]"
+                      />
+                      <svg className="absolute right-0 w-4 h-4 text-ink/[0.06]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                      </svg>
+                    </div>
+                    <span className="text-[10px] font-bold text-ink-muted/30 uppercase tracking-[0.2em]">
+                      {status.trainInfo.duration || 'Scheduled'}
+                    </span>
+                  </div>
+
+                  <div className="text-right">
+                    <p className="text-[10px] text-ink-muted/30 font-bold tracking-widest uppercase mb-2">To</p>
+                    <h3 className="text-2xl font-display font-black text-ink leading-none">{pnrData.to}</h3>
+                    <p className="font-mono text-[14px] text-brand font-bold mt-2">{status.trainInfo.arrivalTime || '--:--'}</p>
                   </div>
                 </div>
 
-                {/* Passengers */}
-                {status.passengers.length > 0 && (
-                  <>
-                    <Divider />
-                    <div className="px-6 pb-6 pt-4">
-                      <p className="text-[11px] text-ink-muted/40 font-medium tracking-widest uppercase mb-3.5">
-                        {status.passengers.length === 1 ? '1 Passenger' : `${status.passengers.length} Passengers`}
+                <div className="flex items-center justify-between pt-6 border-t border-ink/[0.04]">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-2xl bg-brand/5 flex items-center justify-center text-brand">
+                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="text-[10px] text-ink-muted/40 font-bold uppercase tracking-wider">Train</p>
+                      <p className="text-[14px] font-bold text-ink">
+                        <span className="font-mono text-brand">{pnrData.trainNumber}</span>
+                        <span className="mx-2 text-ink/10">|</span>
+                        {pnrData.trainName}
                       </p>
-                      <div className="space-y-1">
-                        {status.passengers.map((passenger, i) => {
-                          const pCfg = STATUS_CONFIG[passenger.currentStatus] ?? STATUS_CONFIG.Unknown
-                          return (
-                            <div key={i} className="flex items-center justify-between py-3 border-b border-ink/[0.04] last:border-0">
-                              <div>
-                                <div className="flex items-baseline gap-2">
-                                  <span className="text-[15px] text-ink font-semibold">{passenger.name}</span>
-                                  {passenger.age > 0 && (
-                                    <span className="text-[12px] text-ink-muted/40 font-mono">{passenger.age}{passenger.gender}</span>
-                                  )}
-                                </div>
-                                {passenger.coachPosition && passenger.seatNumber && (
-                                  <p className="font-mono text-[12px] text-ink-muted/30 mt-0.5">
-                                    {passenger.coachPosition} · Seat {passenger.seatNumber}
-                                  </p>
-                                )}
-                                {passenger.bookingStatus && passenger.bookingStatus !== passenger.currentStatus && (
-                                  <p className="text-[11px] text-ink-muted/20 font-mono mt-0.5">
-                                    Booked: {passenger.bookingStatus}
-                                  </p>
-                                )}
-                              </div>
-                              <span
-                                className={cn(
-                                  'text-[11px] font-bold font-mono tracking-wider px-3 py-1.5 rounded-xl',
-                                  pCfg.textColor, pCfg.badgeBg
-                                )}
-                                style={{ border: `0.5px solid ${pCfg.borderColor}20` }}
-                              >
-                                {passenger.currentStatus}
-                              </span>
-                            </div>
-                          )
-                        })}
-                      </div>
                     </div>
-                  </>
-                )}
+                  </div>
+                  <div className="flex gap-2">
+                    <span className="px-3 py-1.5 rounded-xl bg-ink/[0.04] text-[11px] font-bold text-ink-muted tracking-wide uppercase">{pnrData.class}</span>
+                  </div>
+                </div>
               </motion.div>
 
-              {/* Track toggle — glass or brand filled */}
-              <motion.button
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.25 }}
-                onClick={handleTrackToggle}
-                whileTap={{ scale: 0.97 }}
-                className={cn(
-                  'w-full py-4 rounded-2xl text-[15px] font-semibold tracking-wide transition-all duration-200',
-                  isTracking
-                    ? 'glass-button text-ink-muted hover:text-red-500'
-                    : 'bg-brand text-white shadow-[0_4px_20px_rgba(0,122,255,0.3)] hover:shadow-[0_6px_28px_rgba(0,122,255,0.4)]'
-                )}
-              >
-                {isTracking ? 'Stop Tracking' : '+ Track Updates'}
-              </motion.button>
+              {/* Passenger List — Premium Cards */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between px-2">
+                  <h4 className="text-[11px] font-black text-ink-muted/30 uppercase tracking-[0.2em]">Passenger Details</h4>
+                  <span className="px-2 py-0.5 rounded-md bg-ink/[0.04] text-[10px] font-bold text-ink-muted/40 uppercase">
+                    {status.passengers.length} Total
+                  </span>
+                </div>
 
-              {/* Refresh */}
-              <div className="text-center pt-1 pb-4">
+                {status.passengers.map((passenger, i) => {
+                  const pCfg = STATUS_CONFIG[passenger.currentStatus] ?? STATUS_CONFIG.Unknown
+                  return (
+                    <motion.div
+                      key={i}
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.3 + (i * 0.1) }}
+                      className="glass-heavy rounded-[24px] p-5 flex items-center justify-between group hover:scale-[1.01] transition-all"
+                    >
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 rounded-[18px] bg-ink/[0.04] flex items-center justify-center text-ink-muted/30 font-display font-black text-lg">
+                          {i + 1}
+                        </div>
+                        <div>
+                          <p className="text-[15px] font-bold text-ink mb-0.5">{passenger.name}</p>
+                          <p className="text-[11px] font-bold text-ink-muted/40 uppercase tracking-widest">
+                            {passenger.coachPosition || 'TBA'} · <span className="text-brand/60">Seat {passenger.seatNumber || '--'}</span>
+                          </p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <span
+                          className={cn(
+                            'inline-block px-4 py-2 rounded-2xl text-[11px] font-black tracking-widest uppercase',
+                            pCfg.textColor, pCfg.badgeBg
+                          )}
+                          style={{ border: `1px solid ${pCfg.borderColor}20` }}
+                        >
+                          {passenger.currentStatus}
+                        </span>
+                        {passenger.bookingStatus && passenger.bookingStatus !== passenger.currentStatus && (
+                          <p className="text-[9px] font-bold text-ink-muted/20 uppercase tracking-tighter mt-1.5">
+                            Booked: {passenger.bookingStatus}
+                          </p>
+                        )}
+                      </div>
+                    </motion.div>
+                  )
+                })}
+              </div>
+
+              {/* Action Bar — Sticky at bottom */}
+              <motion.div
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.5 }}
+                className="pt-4 pb-10 flex flex-col gap-4"
+              >
+                <button
+                  onClick={handleTrackToggle}
+                  className={cn(
+                    'w-full h-16 rounded-[24px] font-display font-black text-[15px] tracking-widest uppercase transition-all duration-300',
+                    isTracking
+                      ? 'glass-button text-red-500 hover:bg-red-500/5'
+                      : 'bg-brand text-white shadow-[0_20px_40px_rgba(0,122,255,0.3)] hover:scale-[1.02] active:scale-98'
+                  )}
+                >
+                  {isTracking ? 'Remove from Trips' : 'Track Status Live'}
+                </button>
+
                 <button
                   onClick={() => refetch()}
-                  className="text-[12px] text-ink-muted/25 hover:text-brand transition-colors font-medium tracking-wide inline-flex items-center gap-1.5"
+                  className="flex items-center justify-center gap-3 py-3 text-ink-muted/30 hover:text-brand transition-colors"
                 >
-                  <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                   </svg>
-                  Refresh
+                  <span className="text-[11px] font-black uppercase tracking-[0.2em]">Update Status</span>
                 </button>
-              </div>
-            </>
+              </motion.div>
+            </motion.div>
           )}
         </AnimatePresence>
       </div>

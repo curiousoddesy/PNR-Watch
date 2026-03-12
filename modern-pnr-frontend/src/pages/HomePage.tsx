@@ -97,34 +97,40 @@ export const HomePage: React.FC = () => {
         </button>
       </motion.div>
 
-      {/* Main content — vertically centered */}
-      <div className="relative z-10 flex-1 flex items-center justify-center px-6">
+      {/* Main content — centered and focused */}
+      <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-6">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 32 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-          className="w-full max-w-sm -mt-6"
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+          className="w-full max-w-lg text-center"
         >
-
-          {/* Eyebrow — Indian Railways */}
-          <div className="flex items-center justify-center gap-3 mb-8">
-            <div className="h-px flex-1 bg-gradient-to-r from-transparent to-ink/[0.06]" />
-            <div className="flex items-center gap-2 px-3">
-              <svg className="w-3.5 h-3.5 text-ink-muted/30" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                <path strokeLinecap="round" strokeLinejoin="round"
-                  d="M3 17l.01-.011M7 17l.01-.011M11 17l.01-.011M3 13V7a2 2 0 012-2h14a2 2 0 012 2v6M3 13h18M3 13l-1 4h20l-1-4"
-                />
-              </svg>
-              <p className="text-[11px] font-medium tracking-widest uppercase text-ink-muted/40">
-                Indian Railways
-              </p>
+          {/* Hero Section */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.1, duration: 0.6 }}
+            className="mb-12"
+          >
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand/10 border border-brand/20 mb-6">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-brand"></span>
+              </span>
+              <span className="text-[10px] font-bold tracking-[0.2em] uppercase text-brand">Secure Tracking</span>
             </div>
-            <div className="h-px flex-1 bg-gradient-to-l from-transparent to-ink/[0.06]" />
-          </div>
+            <h2 className="text-4xl md:text-5xl font-display font-extrabold tracking-tight text-ink mb-4">
+              Track your journey <br />
+              <span className="text-brand">with clarity.</span>
+            </h2>
+            <p className="text-ink-muted/60 text-base max-w-[280px] mx-auto leading-relaxed">
+              Enter your 10-digit PNR for real-time status and automatic updates.
+            </p>
+          </motion.div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {/* PNR input — glass inset field */}
-            <div className="relative group">
+          <form onSubmit={handleSubmit} className="relative group max-w-md mx-auto w-full">
+            {/* PNR input — premium glass field */}
+            <div className="relative z-10">
               <input
                 ref={inputRef}
                 type="text"
@@ -134,30 +140,30 @@ export const HomePage: React.FC = () => {
                 onChange={handleInputChange}
                 onFocus={() => setIsFocused(true)}
                 onBlur={() => setIsFocused(false)}
-                placeholder="Enter PNR number"
+                placeholder="000 000 0000"
                 autoComplete="off"
                 className={cn(
-                  'w-full h-[68px] px-6 font-mono text-[24px] tracking-[0.14em] font-semibold',
-                  'rounded-3xl text-ink',
-                  'placeholder:font-sans placeholder:text-[16px] placeholder:tracking-normal',
-                  'placeholder:font-normal placeholder:text-ink-muted/40',
-                  'focus:outline-none transition-all duration-300',
-                  'glass-inset',
-                  (isFocused || isValid) && 'ring-2 ring-brand/40 ring-offset-0'
+                  'w-full h-[84px] px-8 font-mono text-[32px] tracking-[0.16em] font-bold text-center',
+                  'rounded-[32px] text-ink bg-transparent',
+                  'placeholder:font-sans placeholder:text-[20px] placeholder:tracking-normal',
+                  'placeholder:font-medium placeholder:text-ink-muted/20',
+                  'focus:outline-none transition-all duration-500',
+                  'glass-heavy border-2',
+                  isFocused ? 'border-brand/40 shadow-[0_0_40px_rgba(0,122,255,0.15)] scale-[1.02]' : 'border-transparent'
                 )}
               />
 
               <AnimatePresence>
                 {pnr.length > 0 && (
                   <motion.button
-                    initial={{ opacity: 0, scale: 0.7 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.7 }}
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 20 }}
                     type="button"
                     onClick={() => { setPnr(''); inputRef.current?.focus() }}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-ink/10 flex items-center justify-center text-ink-muted/60 hover:bg-ink/20 transition-all"
+                    className="absolute right-6 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-ink/5 flex items-center justify-center text-ink-muted/40 hover:bg-ink/10 transition-all"
                   >
-                    <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                     </svg>
                   </motion.button>
@@ -165,116 +171,114 @@ export const HomePage: React.FC = () => {
               </AnimatePresence>
             </div>
 
-            {/* Digit progress — 10 rounded segments */}
-            <div className="flex gap-[5px] px-2">
-              {Array.from({ length: 10 }, (_, i) => (
-                <motion.div
-                  key={i}
-                  animate={{
-                    backgroundColor: i < pnr.length
-                      ? isValid ? 'var(--color-success)' : 'var(--color-brand)'
-                      : 'var(--color-ink-muted)',
-                    opacity: i < pnr.length ? 1 : 0.15,
-                    scaleY: i === pnr.length - 1 ? [1, 2.2, 1] : 1,
-                  }}
-                  transition={{ duration: 0.12 }}
-                  className="h-[3px] rounded-full flex-1 origin-center"
-                />
-              ))}
-            </div>
-
-            {/* Submit — glass button with brand fill when valid */}
-            <motion.button
-              type="submit"
-              disabled={!isValid}
-              whileTap={isValid ? { scale: 0.96 } : undefined}
-              className={cn(
-                'w-full h-[56px] rounded-2xl font-display font-semibold text-[15px]',
-                'transition-all duration-300 flex items-center justify-center gap-2',
-                isValid
-                  ? 'bg-brand text-white shadow-[0_4px_20px_rgba(0,122,255,0.3),0_1px_4px_rgba(0,122,255,0.15)] hover:shadow-[0_6px_28px_rgba(0,122,255,0.4),0_2px_8px_rgba(0,122,255,0.2)]'
-                  : 'glass-button text-ink-muted/40 cursor-not-allowed'
-              )}
+            {/* Submit button — floating below */}
+            <motion.div
+              animate={{
+                opacity: isValid ? 1 : 0,
+                y: isValid ? 24 : 10,
+                scale: isValid ? 1 : 0.95
+              }}
+              transition={{ type: 'spring', damping: 20, stiffness: 200 }}
+              className="absolute left-0 right-0 pointer-events-none"
             >
-              <span>Check Status</span>
-              {isValid && (
-                <motion.svg
-                  initial={{ x: -4, opacity: 0 }}
-                  animate={{ x: 0, opacity: 1 }}
-                  className="w-4 h-4"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2.5}
-                >
+              <button
+                type="submit"
+                disabled={!isValid}
+                className={cn(
+                  'mx-auto px-10 h-14 rounded-full font-display font-bold text-[15px] pointer-events-auto',
+                  'bg-brand text-white flex items-center justify-center gap-3',
+                  'shadow-[0_20px_40px_rgba(0,122,255,0.3)] hover:shadow-[0_25px_50px_rgba(0,122,255,0.4)]',
+                  'hover:scale-105 active:scale-95 transition-all duration-300'
+                )}
+              >
+                <span>Check Live Status</span>
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                </motion.svg>
-              )}
-            </motion.button>
+                </svg>
+              </button>
+            </motion.div>
           </form>
 
-          {/* Recent PNRs */}
+          {/* Recent PNRs — refined cards */}
           <AnimatePresence>
             {recentQueries.length > 0 && pnr.length === 0 && (
               <motion.div
-                initial={{ opacity: 0, y: 12 }}
+                initial={{ opacity: 0, y: 40 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.3 }}
-                className="mt-10"
+                transition={{ delay: 0.3, duration: 0.6 }}
+                className="mt-28"
               >
-                <p className="text-[11px] text-ink-muted/35 font-medium tracking-widest uppercase mb-3 text-center">
-                  Recent
-                </p>
+                <div className="flex items-center justify-center gap-4 mb-6">
+                  <div className="h-px w-8 bg-ink/[0.08]" />
+                  <p className="text-[10px] text-ink-muted/30 font-bold tracking-[0.25em] uppercase">
+                    Recent Searches
+                  </p>
+                  <div className="h-px w-8 bg-ink/[0.08]" />
+                </div>
 
-                <div className="flex flex-wrap justify-center gap-2">
-                  {recentQueries.map((recent) => {
+                <div className="flex flex-wrap justify-center gap-3">
+                  {recentQueries.slice(0, 3).map((recent, idx) => {
                     const status = getRecentStatus(recent)
                     return (
-                      <button
+                      <motion.button
                         key={recent}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.4 + (idx * 0.1) }}
                         onClick={() => handleRecentClick(recent)}
-                        className={cn(
-                          'flex items-center gap-2 px-4 py-2.5 rounded-2xl',
-                          'glass-button group'
-                        )}
+                        className="group relative flex items-center gap-4 pl-5 pr-6 py-4 rounded-[24px] glass-button overflow-hidden"
                       >
-                        {status && (
-                          <span className={cn('w-[6px] h-[6px] rounded-full flex-shrink-0', STATUS_DOT[status] ?? 'bg-ink-muted/30')} />
-                        )}
-                        <span className="font-mono text-[13px] text-ink/60 tracking-wider group-hover:text-brand transition-colors">{recent}</span>
-                      </button>
+                        <div className={cn(
+                          'w-2 h-2 rounded-full',
+                          STATUS_DOT[status ?? ''] ?? 'bg-ink-muted/20'
+                        )} />
+                        <div className="text-left">
+                          <p className="font-mono text-[15px] font-bold text-ink tracking-widest group-hover:text-brand transition-colors">
+                            {recent}
+                          </p>
+                          <p className="text-[10px] font-bold text-ink-muted/40 uppercase tracking-wider">
+                            {status || 'View Status'}
+                          </p>
+                        </div>
+                      </motion.button>
                     )
                   })}
                 </div>
               </motion.div>
             )}
           </AnimatePresence>
-
-          {recentQueries.length === 0 && pnr.length === 0 && (
-            <div className="text-center mt-10">
-              <p className="text-[13px] text-ink-muted/30 tracking-wide">
-                10-digit number from your booking confirmation
-              </p>
-            </div>
-          )}
         </motion.div>
       </div>
 
-      {/* QR scan FAB — glass circle */}
-      <div className="fixed bottom-24 right-6 z-20">
-        <button
-          onClick={() => setShowScanner(true)}
-          className="w-12 h-12 rounded-2xl glass-button flex items-center justify-center hover:text-brand transition-all"
-          aria-label="Scan QR code"
-        >
-          <svg className="w-5 h-5 text-ink-muted/60" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-            <path strokeLinecap="round" strokeLinejoin="round"
-              d="M3 9V6a3 3 0 013-3h3M3 15v3a3 3 0 003 3h3M15 3h3a3 3 0 013 3v3M15 21h3a3 3 0 003-3v-3M9 9h6v6H9z"
-            />
-          </svg>
-        </button>
-      </div>
+      {/* Action Footer — Floating Bar */}
+      <motion.div
+        initial={{ y: 100 }}
+        animate={{ y: 0 }}
+        transition={{ delay: 0.5, type: 'spring', damping: 25 }}
+        className="fixed bottom-10 left-1/2 -translate-x-1/2 z-20"
+      >
+        <div className="px-2 py-2 rounded-full glass-heavy flex items-center gap-1 shadow-2xl">
+          <button
+            onClick={() => setShowScanner(true)}
+            className="flex items-center gap-3 px-6 py-3 rounded-full hover:bg-ink/5 transition-all text-ink/70 hover:text-brand"
+          >
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3 9V6a3 3 0 013-3h3M3 15v3a3 3 0 003 3h3M15 3h3a3 3 0 013 3v3M15 21h3a3 3 0 003-3v-3M9 9h6v6H9z" />
+            </svg>
+            <span className="text-[13px] font-bold">Scan Ticket</span>
+          </button>
+          <div className="w-px h-6 bg-ink/[0.08]" />
+          <button
+            onClick={() => navigate('/tracking')}
+            className="flex items-center gap-3 px-6 py-3 rounded-full hover:bg-ink/5 transition-all text-ink/70 hover:text-brand"
+          >
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+            </svg>
+            <span className="text-[13px] font-bold">My Trips</span>
+          </button>
+        </div>
+      </motion.div>
 
       {showScanner && (
         <QRScannerModal

@@ -29,26 +29,26 @@
   --color-text-secondary: var(--color-ink-muted);
   --color-border: var(--color-edge);
 
-  /* Glass material tokens */
-  --glass-bg: rgba(255, 255, 255, 0.55);
-  --glass-bg-heavy: rgba(255, 255, 255, 0.72);
-  --glass-border: rgba(255, 255, 255, 0.7);
-  --glass-highlight: rgba(255, 255, 255, 0.9);
-  --glass-shadow-inner: rgba(0, 0, 0, 0.04);
-  --glass-shadow-drop: rgba(0, 0, 0, 0.08);
+  /* Glass material tokens — Refined for depth */
+  --glass-bg: rgba(255, 255, 255, 0.45);
+  --glass-bg-heavy: rgba(255, 255, 255, 0.65);
+  --glass-border: rgba(255, 255, 255, 0.8);
+  --glass-highlight: rgba(255, 255, 255, 0.95);
+  --glass-shadow-inner: rgba(0, 0, 0, 0.05);
+  --glass-shadow-drop: rgba(0, 0, 0, 0.06);
   --glass-blur: 40px;
 
-  --animation-duration: 0.2s;
-  --animation-easing: cubic-bezier(0.4, 0, 0.2, 1);
+  --animation-duration: 0.3s;
+  --animation-easing: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .dark {
   --color-ink: #F5F5F7;
   --color-ink-muted: #98989D;
-  --color-surface: rgba(255, 255, 255, 0.07);
+  --color-surface: rgba(255, 255, 255, 0.06);
   --color-surface-solid: #1C1C1E;
   --color-ground: #000000;
-  --color-edge: rgba(255, 255, 255, 0.1);
+  --color-edge: rgba(255, 255, 255, 0.08);
   --color-brand: #0A84FF;
 
   --color-success: #30D158;
@@ -62,12 +62,12 @@
   --color-text-secondary: var(--color-ink-muted);
   --color-border: var(--color-edge);
 
-  --glass-bg: rgba(255, 255, 255, 0.07);
-  --glass-bg-heavy: rgba(255, 255, 255, 0.12);
-  --glass-border: rgba(255, 255, 255, 0.1);
-  --glass-highlight: rgba(255, 255, 255, 0.08);
-  --glass-shadow-inner: rgba(0, 0, 0, 0.3);
-  --glass-shadow-drop: rgba(0, 0, 0, 0.25);
+  --glass-bg: rgba(28, 28, 30, 0.45);
+  --glass-bg-heavy: rgba(28, 28, 30, 0.75);
+  --glass-border: rgba(255, 255, 255, 0.12);
+  --glass-highlight: rgba(255, 255, 255, 0.1);
+  --glass-shadow-inner: rgba(0, 0, 0, 0.4);
+  --glass-shadow-drop: rgba(0, 0, 0, 0.3);
   --glass-blur: 40px;
 }
 
@@ -101,26 +101,33 @@ body {
   position: relative;
 }
 
+@keyframes ambient-pulse {
+  0%, 100% { opacity: 0.8; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.05); }
+}
+
 .bg-vivid::before {
   content: '';
   position: fixed;
-  inset: 0;
+  inset: -10%;
   z-index: 0;
   pointer-events: none;
   background:
-    radial-gradient(ellipse 60% 50% at 15% 25%, rgba(0, 122, 255, 0.12) 0%, transparent 60%),
-    radial-gradient(ellipse 50% 50% at 85% 20%, rgba(175, 82, 222, 0.10) 0%, transparent 55%),
-    radial-gradient(ellipse 55% 45% at 50% 75%, rgba(255, 149, 0, 0.07) 0%, transparent 50%),
-    radial-gradient(ellipse 40% 40% at 25% 80%, rgba(52, 199, 89, 0.06) 0%, transparent 45%),
+    radial-gradient(ellipse 60% 50% at 15% 25%, rgba(0, 122, 255, 0.15) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 50% at 85% 20%, rgba(175, 82, 222, 0.12) 0%, transparent 55%),
+    radial-gradient(ellipse 55% 45% at 50% 75%, rgba(255, 149, 0, 0.1) 0%, transparent 50%),
+    radial-gradient(ellipse 40% 40% at 25% 80%, rgba(52, 199, 89, 0.08) 0%, transparent 45%),
     linear-gradient(160deg, #F2F1F6 0%, #E8E4F0 25%, #DEE8F5 50%, #F0EBE5 75%, #F2F1F6 100%);
+  filter: blur(60px);
+  animation: ambient-pulse 20s ease-in-out infinite;
 }
 
 .dark .bg-vivid::before {
   background:
-    radial-gradient(ellipse 60% 50% at 15% 25%, rgba(10, 132, 255, 0.15) 0%, transparent 60%),
-    radial-gradient(ellipse 50% 50% at 85% 20%, rgba(175, 82, 222, 0.10) 0%, transparent 55%),
-    radial-gradient(ellipse 55% 45% at 50% 75%, rgba(255, 159, 10, 0.06) 0%, transparent 50%),
-    radial-gradient(ellipse 40% 40% at 25% 80%, rgba(48, 209, 88, 0.05) 0%, transparent 45%),
+    radial-gradient(ellipse 60% 50% at 15% 25%, rgba(10, 132, 255, 0.18) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 50% at 85% 20%, rgba(175, 82, 222, 0.15) 0%, transparent 55%),
+    radial-gradient(ellipse 55% 45% at 50% 75%, rgba(255, 159, 10, 0.1) 0%, transparent 50%),
+    radial-gradient(ellipse 40% 40% at 25% 80%, rgba(48, 209, 88, 0.08) 0%, transparent 45%),
     linear-gradient(160deg, #000000 0%, #0A0E1A 25%, #0D1220 50%, #0A0D14 75%, #000000 100%);
 }
 
