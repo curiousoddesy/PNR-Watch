@@ -7,15 +7,15 @@ import { cn } from '../utils/cn'
 import type { PNR } from '../types'
 
 const STATUS_STYLE: Record<string, { textColor: string; badgeBg: string; borderColor: string; dot: string }> = {
-  CNF:     { textColor: 'text-emerald-400',  badgeBg: 'bg-emerald-500/10', borderColor: '#34D399', dot: 'bg-emerald-400' },
-  RAC:     { textColor: 'text-amber-400',    badgeBg: 'bg-amber-500/10',   borderColor: '#FBBF24', dot: 'bg-amber-400'   },
-  WL:      { textColor: 'text-orange-400',   badgeBg: 'bg-orange-500/10',  borderColor: '#FB923C', dot: 'bg-orange-400'  },
-  PQWL:    { textColor: 'text-orange-400',   badgeBg: 'bg-orange-500/10',  borderColor: '#FB923C', dot: 'bg-orange-400'  },
-  CAN:     { textColor: 'text-red-400',      badgeBg: 'bg-red-500/10',     borderColor: '#F87171', dot: 'bg-red-400'     },
-  FLUSHED: { textColor: 'text-slate-400',    badgeBg: 'bg-slate-500/10',   borderColor: '#94A3B8', dot: 'bg-slate-400'   },
+  CNF:     { textColor: 'text-green-600 dark:text-green-400',   badgeBg: 'bg-green-500/10',   borderColor: '#34C759', dot: 'bg-green-500' },
+  RAC:     { textColor: 'text-amber-600 dark:text-amber-400',   badgeBg: 'bg-amber-500/10',   borderColor: '#FF9F0A', dot: 'bg-amber-500' },
+  WL:      { textColor: 'text-orange-600 dark:text-orange-400', badgeBg: 'bg-orange-500/10',  borderColor: '#FF9500', dot: 'bg-orange-500' },
+  PQWL:    { textColor: 'text-orange-600 dark:text-orange-400', badgeBg: 'bg-orange-500/10',  borderColor: '#FF9500', dot: 'bg-orange-500' },
+  CAN:     { textColor: 'text-red-600 dark:text-red-400',       badgeBg: 'bg-red-500/10',     borderColor: '#FF3B30', dot: 'bg-red-500' },
+  FLUSHED: { textColor: 'text-gray-500 dark:text-gray-400',     badgeBg: 'bg-gray-500/10',    borderColor: '#8E8E93', dot: 'bg-gray-400' },
 }
 
-const FALLBACK_STYLE = { textColor: 'text-slate-400', badgeBg: 'bg-slate-500/10', borderColor: '#64748B', dot: 'bg-slate-400' }
+const FALLBACK_STYLE = { textColor: 'text-gray-500 dark:text-gray-400', badgeBg: 'bg-gray-500/10', borderColor: '#8E8E93', dot: 'bg-gray-400' }
 
 export const TrackingPage: React.FC = () => {
   const navigate = useNavigate()
@@ -26,20 +26,20 @@ export const TrackingPage: React.FC = () => {
   )
 
   return (
-    <div className="min-h-screen bg-ground bg-mesh bg-dots">
+    <div className="min-h-screen bg-ground bg-vivid">
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -8 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-        className="flex items-center gap-3 px-5 pt-6 pb-4 max-w-lg mx-auto relative z-10"
+        transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+        className="flex items-center gap-3 px-5 pt-7 pb-3 max-w-lg mx-auto relative z-10"
       >
         <div>
           <div className="flex items-center gap-1.5 mb-0.5">
-            <div className="w-1.5 h-1.5 rounded-full bg-brand animate-signal-pulse" />
-            <p className="text-[10px] text-ink-muted/40 font-mono font-medium tracking-[0.2em] uppercase leading-none">Watching</p>
+            <div className="w-[6px] h-[6px] rounded-full bg-green-500 animate-signal-pulse" />
+            <p className="text-[11px] text-ink-muted/40 font-medium tracking-widest uppercase leading-none">Watching</p>
           </div>
-          <h1 className="font-display font-extrabold text-2xl text-ink leading-tight">
+          <h1 className="font-display font-bold text-[26px] text-ink leading-tight">
             {sortedPNRs.length} PNR{sortedPNRs.length !== 1 ? 's' : ''}
           </h1>
         </div>
@@ -52,7 +52,7 @@ export const TrackingPage: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             className="text-center py-24"
           >
-            <div className="w-16 h-16 rounded-2xl glass flex items-center justify-center mx-auto mb-5">
+            <div className="w-[72px] h-[72px] rounded-3xl glass-heavy flex items-center justify-center mx-auto mb-5">
               <svg width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1} className="text-ink-muted/20">
                 <path strokeLinecap="round" strokeLinejoin="round"
                   d="M3 17l.01-.011M7 17l.01-.011M11 17l.01-.011M3 13V7a2 2 0 012-2h14a2 2 0 012 2v6M3 13h18M3 13l-1 4h20l-1-4"
@@ -60,17 +60,17 @@ export const TrackingPage: React.FC = () => {
               </svg>
             </div>
             <p className="text-ink font-display font-bold text-lg mb-1">No journeys tracked</p>
-            <p className="text-sm text-ink-muted/40 mb-8 font-mono">Check a PNR and tap "Track Updates"</p>
+            <p className="text-[14px] text-ink-muted/40 mb-8">Check a PNR and tap "Track Updates"</p>
             <button
               onClick={() => navigate('/')}
-              className="px-6 py-2.5 bg-brand text-ground rounded-xl text-sm font-display font-bold hover:brightness-110 transition-all glow-signal"
+              className="px-7 py-3 bg-brand text-white rounded-2xl text-[15px] font-semibold shadow-[0_4px_16px_rgba(0,122,255,0.25)] hover:shadow-[0_6px_24px_rgba(0,122,255,0.35)] transition-all"
             >
               Check a PNR
             </button>
           </motion.div>
         ) : (
           <AnimatePresence initial={false}>
-            <div className="space-y-2.5 pt-1">
+            <div className="space-y-3 pt-1">
               {sortedPNRs.map((pnr, i) => (
                 <PNRListItem
                   key={pnr.id}
@@ -113,25 +113,25 @@ const PNRListItem: React.FC<{
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, x: -40, transition: { duration: 0.15 } }}
-      transition={{ duration: 0.25, delay: index * 0.04 }}
+      transition={{ duration: 0.3, delay: index * 0.05 }}
       onClick={onClick}
-      className="glass rounded-2xl cursor-pointer hover:border-brand/30 transition-all duration-200 overflow-hidden group"
+      className="glass-heavy rounded-3xl cursor-pointer hover:scale-[1.01] active:scale-[0.98] transition-all duration-200 overflow-hidden group"
       style={{ borderLeftWidth: '3px', borderLeftColor: style.borderColor }}
     >
       <div className="px-5 py-4 flex items-center justify-between">
         <div className="flex-1 min-w-0">
           {/* PNR + status */}
           <div className="flex items-center gap-2.5 mb-1.5">
-            <span className="font-mono text-sm text-ink font-semibold tracking-wider">{pnr.number}</span>
+            <span className="font-mono text-[14px] text-ink font-semibold tracking-wider">{pnr.number}</span>
 
             <span className={cn(
-              'relative inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold font-mono tracking-wider',
+              'relative inline-flex items-center px-2.5 py-0.5 rounded-lg text-[10px] font-bold font-mono tracking-wider',
               style.textColor, style.badgeBg
             )}>
               {status}
               {isLive && (
                 <motion.span
-                  className={cn('absolute inset-0 rounded-md', style.badgeBg)}
+                  className={cn('absolute inset-0 rounded-lg', style.badgeBg)}
                   animate={{ opacity: [0.8, 0, 0.8] }}
                   transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
                 />
@@ -140,18 +140,18 @@ const PNRListItem: React.FC<{
           </div>
 
           {/* Train */}
-          <p className="text-xs text-ink-muted/50 truncate mb-1">
+          <p className="text-[13px] text-ink-muted/50 truncate mb-1">
             <span className="font-mono text-brand/50">{pnr.trainNumber}</span>
-            <span className="mx-1.5 text-edge">|</span>
+            <span className="mx-1.5 text-ink/[0.08]">|</span>
             <span>{pnr.trainName}</span>
           </p>
 
           {/* Route + date */}
-          <div className="flex items-center gap-1.5 text-[11px] text-ink-muted/35 font-mono">
+          <div className="flex items-center gap-1.5 text-[12px] text-ink-muted/35 font-mono">
             <span>{pnr.from}</span>
-            <span className="text-brand/30">-></span>
+            <span className="text-brand/25">-></span>
             <span>{pnr.to}</span>
-            <span className="text-edge">·</span>
+            <span className="text-ink/[0.06]">·</span>
             <span>{formatDate(pnr.dateOfJourney)}</span>
           </div>
         </div>
@@ -164,14 +164,14 @@ const PNRListItem: React.FC<{
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4l3-3-3-3V4a10 10 0 100 20v-2a8 8 0 01-8-8z" />
             </svg>
           ) : lastUpdatedLabel ? (
-            <span className="text-[9px] text-ink-muted/20 font-mono">{lastUpdatedLabel}</span>
+            <span className="text-[10px] text-ink-muted/20 font-mono">{lastUpdatedLabel}</span>
           ) : null}
           <button
             onClick={(e) => { e.stopPropagation(); onRemove() }}
-            className="w-7 h-7 rounded-lg flex items-center justify-center text-ink-muted/15 hover:text-red-400 hover:bg-red-500/10 transition-all"
+            className="w-8 h-8 rounded-xl flex items-center justify-center text-ink-muted/15 hover:text-red-500 hover:bg-red-500/10 transition-all"
             aria-label={`Remove PNR ${pnr.number}`}
           >
-            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>

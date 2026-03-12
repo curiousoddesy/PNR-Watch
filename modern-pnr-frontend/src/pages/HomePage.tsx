@@ -6,11 +6,11 @@ import { useThemeContext } from '../contexts/ThemeContext'
 import { cn } from '../utils/cn'
 
 const STATUS_DOT: Record<string, string> = {
-  CNF: 'bg-emerald-400',
-  RAC: 'bg-amber-400',
-  WL: 'bg-orange-400',
-  PQWL: 'bg-orange-400',
-  CAN: 'bg-red-400',
+  CNF: 'bg-green-500',
+  RAC: 'bg-amber-500',
+  WL: 'bg-orange-500',
+  PQWL: 'bg-orange-500',
+  CAN: 'bg-red-500',
 }
 
 export const HomePage: React.FC = () => {
@@ -58,30 +58,30 @@ export const HomePage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-ground bg-mesh bg-dots flex flex-col relative overflow-hidden">
+    <div className="min-h-screen bg-ground bg-vivid flex flex-col relative overflow-hidden">
 
-      {/* Header */}
+      {/* Header — floating glass bar */}
       <motion.div
-        initial={{ opacity: 0, y: -8 }}
+        initial={{ opacity: 0, y: -12 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-        className="relative z-10 flex items-center justify-between px-6 pt-8"
+        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+        className="relative z-10 flex items-center justify-between px-6 pt-7 pb-2"
       >
         <div>
-          <h1 className="font-display font-extrabold text-[22px] tracking-tight leading-none">
+          <h1 className="font-display font-bold text-[22px] tracking-tight leading-none">
             <span className="text-brand">PNR</span>
-            <span className="text-ink/15 mx-0.5">/</span>
-            <span className="text-ink">WATCH</span>
+            <span className="text-ink/10 mx-0.5">/</span>
+            <span className="text-ink">Watch</span>
           </h1>
-          <div className="flex items-center gap-1.5 mt-1.5">
-            <div className="w-1.5 h-1.5 rounded-full bg-brand animate-signal-pulse" />
-            <span className="text-[10px] font-mono text-ink-muted/50 tracking-[0.2em] uppercase">Live Status</span>
+          <div className="flex items-center gap-1.5 mt-1">
+            <div className="w-[6px] h-[6px] rounded-full bg-green-500 animate-signal-pulse" />
+            <span className="text-[11px] font-medium text-ink-muted/60 tracking-wide">Live Status</span>
           </div>
         </div>
 
         <button
           onClick={() => setThemeMode(currentMode === 'dark' ? 'light' : 'dark')}
-          className="w-9 h-9 rounded-xl glass flex items-center justify-center text-ink-muted hover:text-brand transition-colors"
+          className="w-10 h-10 rounded-2xl glass-button flex items-center justify-center text-ink-muted hover:text-brand transition-colors"
           aria-label="Toggle dark mode"
         >
           {currentMode === 'dark' ? (
@@ -97,33 +97,33 @@ export const HomePage: React.FC = () => {
         </button>
       </motion.div>
 
-      {/* Main — vertically centered */}
+      {/* Main content — vertically centered */}
       <div className="relative z-10 flex-1 flex items-center justify-center px-6">
         <motion.div
-          initial={{ opacity: 0, y: 16 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-          className="w-full max-w-sm -mt-8"
+          transition={{ duration: 0.6, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+          className="w-full max-w-sm -mt-6"
         >
 
-          {/* Eyebrow */}
+          {/* Eyebrow — Indian Railways */}
           <div className="flex items-center justify-center gap-3 mb-8">
-            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-edge/60 to-transparent" />
+            <div className="h-px flex-1 bg-gradient-to-r from-transparent to-ink/[0.06]" />
             <div className="flex items-center gap-2 px-3">
-              <svg className="w-3.5 h-3.5 text-brand/40" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <svg className="w-3.5 h-3.5 text-ink-muted/30" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                 <path strokeLinecap="round" strokeLinejoin="round"
                   d="M3 17l.01-.011M7 17l.01-.011M11 17l.01-.011M3 13V7a2 2 0 012-2h14a2 2 0 012 2v6M3 13h18M3 13l-1 4h20l-1-4"
                 />
               </svg>
-              <p className="text-[10px] font-mono font-medium tracking-[0.2em] uppercase text-ink-muted/40">
+              <p className="text-[11px] font-medium tracking-widest uppercase text-ink-muted/40">
                 Indian Railways
               </p>
             </div>
-            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-edge/60 to-transparent" />
+            <div className="h-px flex-1 bg-gradient-to-l from-transparent to-ink/[0.06]" />
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-3.5">
-            {/* PNR input */}
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {/* PNR input — glass inset field */}
             <div className="relative group">
               <input
                 ref={inputRef}
@@ -137,14 +137,13 @@ export const HomePage: React.FC = () => {
                 placeholder="Enter PNR number"
                 autoComplete="off"
                 className={cn(
-                  'w-full h-16 px-5 font-mono text-2xl tracking-[0.15em] font-semibold',
-                  'bg-surface border rounded-2xl text-ink',
-                  'placeholder:font-sans placeholder:text-base placeholder:tracking-normal',
-                  'placeholder:font-normal placeholder:text-ink-muted/30',
+                  'w-full h-[68px] px-6 font-mono text-[24px] tracking-[0.14em] font-semibold',
+                  'rounded-3xl text-ink',
+                  'placeholder:font-sans placeholder:text-[16px] placeholder:tracking-normal',
+                  'placeholder:font-normal placeholder:text-ink-muted/40',
                   'focus:outline-none transition-all duration-300',
-                  (isFocused || isValid)
-                    ? 'border-brand/60 glow-signal'
-                    : 'border-edge hover:border-edge/80'
+                  'glass-inset',
+                  (isFocused || isValid) && 'ring-2 ring-brand/40 ring-offset-0'
                 )}
               />
 
@@ -156,9 +155,9 @@ export const HomePage: React.FC = () => {
                     exit={{ opacity: 0, scale: 0.7 }}
                     type="button"
                     onClick={() => { setPnr(''); inputRef.current?.focus() }}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 w-7 h-7 rounded-lg bg-edge/40 flex items-center justify-center text-ink-muted hover:bg-brand/15 hover:text-brand transition-all"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-ink/10 flex items-center justify-center text-ink-muted/60 hover:bg-ink/20 transition-all"
                   >
-                    <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                    <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                     </svg>
                   </motion.button>
@@ -166,35 +165,35 @@ export const HomePage: React.FC = () => {
               </AnimatePresence>
             </div>
 
-            {/* Digit progress — 10 segments */}
-            <div className="flex gap-1 px-0.5">
+            {/* Digit progress — 10 rounded segments */}
+            <div className="flex gap-[5px] px-2">
               {Array.from({ length: 10 }, (_, i) => (
                 <motion.div
                   key={i}
                   animate={{
                     backgroundColor: i < pnr.length
-                      ? isValid ? 'var(--color-brand)' : 'var(--color-ink-muted)'
-                      : 'var(--color-edge)',
-                    opacity: i < pnr.length ? 1 : 0.5,
-                    scaleY: i === pnr.length - 1 ? [1, 2, 1] : 1,
+                      ? isValid ? 'var(--color-success)' : 'var(--color-brand)'
+                      : 'var(--color-ink-muted)',
+                    opacity: i < pnr.length ? 1 : 0.15,
+                    scaleY: i === pnr.length - 1 ? [1, 2.2, 1] : 1,
                   }}
                   transition={{ duration: 0.12 }}
-                  className="h-1 rounded-full flex-1 origin-center"
+                  className="h-[3px] rounded-full flex-1 origin-center"
                 />
               ))}
             </div>
 
-            {/* Submit */}
+            {/* Submit — glass button with brand fill when valid */}
             <motion.button
               type="submit"
               disabled={!isValid}
-              whileTap={isValid ? { scale: 0.97 } : undefined}
+              whileTap={isValid ? { scale: 0.96 } : undefined}
               className={cn(
-                'w-full h-[52px] rounded-xl font-display font-bold tracking-wide text-sm',
+                'w-full h-[56px] rounded-2xl font-display font-semibold text-[15px]',
                 'transition-all duration-300 flex items-center justify-center gap-2',
                 isValid
-                  ? 'bg-brand text-ground border-2 border-brand glow-signal-strong hover:brightness-110'
-                  : 'bg-surface text-ink-muted/40 border-2 border-edge cursor-not-allowed'
+                  ? 'bg-brand text-white shadow-[0_4px_20px_rgba(0,122,255,0.3),0_1px_4px_rgba(0,122,255,0.15)] hover:shadow-[0_6px_28px_rgba(0,122,255,0.4),0_2px_8px_rgba(0,122,255,0.2)]'
+                  : 'glass-button text-ink-muted/40 cursor-not-allowed'
               )}
             >
               <span>Check Status</span>
@@ -221,10 +220,10 @@ export const HomePage: React.FC = () => {
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.25 }}
+                transition={{ duration: 0.3 }}
                 className="mt-10"
               >
-                <p className="text-[10px] text-ink-muted/30 font-mono font-medium tracking-[0.2em] uppercase mb-3 text-center">
+                <p className="text-[11px] text-ink-muted/35 font-medium tracking-widest uppercase mb-3 text-center">
                   Recent
                 </p>
 
@@ -236,15 +235,14 @@ export const HomePage: React.FC = () => {
                         key={recent}
                         onClick={() => handleRecentClick(recent)}
                         className={cn(
-                          'flex items-center gap-2 px-3.5 py-2 rounded-xl',
-                          'glass hover:border-brand/30',
-                          'transition-all duration-200 group'
+                          'flex items-center gap-2 px-4 py-2.5 rounded-2xl',
+                          'glass-button group'
                         )}
                       >
                         {status && (
-                          <span className={cn('w-1.5 h-1.5 rounded-full flex-shrink-0', STATUS_DOT[status] ?? 'bg-edge')} />
+                          <span className={cn('w-[6px] h-[6px] rounded-full flex-shrink-0', STATUS_DOT[status] ?? 'bg-ink-muted/30')} />
                         )}
-                        <span className="font-mono text-[13px] text-ink/70 tracking-wider group-hover:text-brand transition-colors">{recent}</span>
+                        <span className="font-mono text-[13px] text-ink/60 tracking-wider group-hover:text-brand transition-colors">{recent}</span>
                       </button>
                     )
                   })}
@@ -255,7 +253,7 @@ export const HomePage: React.FC = () => {
 
           {recentQueries.length === 0 && pnr.length === 0 && (
             <div className="text-center mt-10">
-              <p className="text-xs text-ink-muted/25 tracking-wide font-mono">
+              <p className="text-[13px] text-ink-muted/30 tracking-wide">
                 10-digit number from your booking confirmation
               </p>
             </div>
@@ -263,18 +261,14 @@ export const HomePage: React.FC = () => {
         </motion.div>
       </div>
 
-      {/* QR scan FAB */}
+      {/* QR scan FAB — glass circle */}
       <div className="fixed bottom-24 right-6 z-20">
         <button
           onClick={() => setShowScanner(true)}
-          className={cn(
-            'w-11 h-11 rounded-xl glass shadow-lg',
-            'flex items-center justify-center',
-            'hover:border-brand/40 hover:text-brand hover:glow-signal hover:scale-105 transition-all duration-200'
-          )}
+          className="w-12 h-12 rounded-2xl glass-button flex items-center justify-center hover:text-brand transition-all"
           aria-label="Scan QR code"
         >
-          <svg className="w-[18px] h-[18px] text-ink-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+          <svg className="w-5 h-5 text-ink-muted/60" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
             <path strokeLinecap="round" strokeLinejoin="round"
               d="M3 9V6a3 3 0 013-3h3M3 15v3a3 3 0 003 3h3M15 3h3a3 3 0 013 3v3M15 21h3a3 3 0 003-3v-3M9 9h6v6H9z"
             />
@@ -337,7 +331,8 @@ const QRScannerModal: React.FC<{
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-md"
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center"
+      style={{ background: 'rgba(0, 0, 0, 0.3)', backdropFilter: 'blur(12px)' }}
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
       <motion.div
@@ -345,21 +340,21 @@ const QRScannerModal: React.FC<{
         animate={{ y: 0, opacity: 1 }}
         exit={{ y: 60, opacity: 0 }}
         transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-        className="w-full max-w-md bg-surface rounded-t-3xl sm:rounded-2xl p-6 shadow-2xl border border-edge"
+        className="w-full max-w-md glass-heavy rounded-t-3xl sm:rounded-3xl p-6"
       >
         <div className="flex items-center justify-between mb-5">
           <h2 className="font-display font-bold text-lg text-ink">Scan QR Code</h2>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-lg bg-ground flex items-center justify-center text-ink-muted hover:text-brand transition-colors"
+            className="w-8 h-8 rounded-full bg-ink/[0.06] flex items-center justify-center text-ink-muted hover:text-ink transition-colors"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
-        <div id="qr-reader" ref={scannerRef} className="w-full rounded-xl overflow-hidden bg-ground" />
-        <p className="text-xs text-ink-muted/40 text-center mt-4 font-mono">
+        <div id="qr-reader" ref={scannerRef} className="w-full rounded-2xl overflow-hidden bg-black/5" />
+        <p className="text-[13px] text-ink-muted/40 text-center mt-4">
           Position the QR code from your booking within the frame
         </p>
       </motion.div>

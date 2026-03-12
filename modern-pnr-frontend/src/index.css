@@ -1,22 +1,26 @@
-@import url('https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Figtree:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  /* Signal — Light mode */
-  --color-ink: #111827;
-  --color-ink-muted: #6B7280;
-  --color-surface: #FFFFFF;
-  --color-ground: #F5F6FA;
-  --color-edge: #DFE2EB;
-  --color-brand: #16B364;
+/* ================================================================
+   iOS 26 Liquid Glass Design System
+   ================================================================ */
 
-  --color-status-confirmed: #059669;
-  --color-status-rac: #D97706;
-  --color-status-waitlist: #EA580C;
-  --color-status-cancelled: #DC2626;
+:root {
+  /* Liquid Glass — Light mode */
+  --color-ink: #1C1C1E;
+  --color-ink-muted: #8E8E93;
+  --color-surface: rgba(255, 255, 255, 0.55);
+  --color-surface-solid: #FFFFFF;
+  --color-ground: #F2F1F6;
+  --color-edge: rgba(255, 255, 255, 0.7);
+  --color-brand: #007AFF;
+
+  --color-success: #34C759;
+  --color-warning: #FF9F0A;
+  --color-error: #FF3B30;
 
   --color-primary: var(--color-brand);
   --color-secondary: var(--color-ink-muted);
@@ -24,21 +28,32 @@
   --color-text: var(--color-ink);
   --color-text-secondary: var(--color-ink-muted);
   --color-border: var(--color-edge);
-  --color-success: #059669;
-  --color-warning: #D97706;
-  --color-error: #DC2626;
+
+  /* Glass material tokens */
+  --glass-bg: rgba(255, 255, 255, 0.55);
+  --glass-bg-heavy: rgba(255, 255, 255, 0.72);
+  --glass-border: rgba(255, 255, 255, 0.7);
+  --glass-highlight: rgba(255, 255, 255, 0.9);
+  --glass-shadow-inner: rgba(0, 0, 0, 0.04);
+  --glass-shadow-drop: rgba(0, 0, 0, 0.08);
+  --glass-blur: 40px;
 
   --animation-duration: 0.2s;
   --animation-easing: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .dark {
-  --color-ink: #E4E8F1;
-  --color-ink-muted: #6A7186;
-  --color-surface: #12161F;
-  --color-ground: #0A0D14;
-  --color-edge: #1C2030;
-  --color-brand: #22D87C;
+  --color-ink: #F5F5F7;
+  --color-ink-muted: #98989D;
+  --color-surface: rgba(255, 255, 255, 0.07);
+  --color-surface-solid: #1C1C1E;
+  --color-ground: #000000;
+  --color-edge: rgba(255, 255, 255, 0.1);
+  --color-brand: #0A84FF;
+
+  --color-success: #30D158;
+  --color-warning: #FFD60A;
+  --color-error: #FF453A;
 
   --color-primary: var(--color-brand);
   --color-secondary: var(--color-ink-muted);
@@ -46,15 +61,18 @@
   --color-text: var(--color-ink);
   --color-text-secondary: var(--color-ink-muted);
   --color-border: var(--color-edge);
-  --color-success: #34D399;
-  --color-warning: #FBBF24;
-  --color-error: #F87171;
+
+  --glass-bg: rgba(255, 255, 255, 0.07);
+  --glass-bg-heavy: rgba(255, 255, 255, 0.12);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-highlight: rgba(255, 255, 255, 0.08);
+  --glass-shadow-inner: rgba(0, 0, 0, 0.3);
+  --glass-shadow-drop: rgba(0, 0, 0, 0.25);
+  --glass-blur: 40px;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
+  *, *::before, *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
@@ -63,7 +81,7 @@
 }
 
 body {
-  font-family: 'Figtree', system-ui, -apple-system, sans-serif;
+  font-family: 'Outfit', system-ui, -apple-system, sans-serif;
   line-height: 1.5;
   font-weight: 400;
   color-scheme: dark light;
@@ -71,90 +89,188 @@ body {
   color: var(--color-ink);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
 }
 
-/* Gradient mesh background — ambient depth */
-.bg-mesh::before {
+/* ================================================================
+   Vibrant gradient mesh background
+   The soul of Liquid Glass — content shows through glass surfaces
+   ================================================================ */
+
+.bg-vivid {
+  position: relative;
+}
+
+.bg-vivid::before {
   content: '';
   position: fixed;
   inset: 0;
   z-index: 0;
   pointer-events: none;
   background:
-    radial-gradient(ellipse 80% 50% at 20% 40%, rgba(34, 216, 124, 0.04) 0%, transparent 70%),
-    radial-gradient(ellipse 60% 40% at 80% 20%, rgba(99, 102, 241, 0.03) 0%, transparent 60%),
-    radial-gradient(ellipse 50% 50% at 50% 80%, rgba(34, 216, 124, 0.02) 0%, transparent 50%);
+    radial-gradient(ellipse 60% 50% at 15% 25%, rgba(0, 122, 255, 0.12) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 50% at 85% 20%, rgba(175, 82, 222, 0.10) 0%, transparent 55%),
+    radial-gradient(ellipse 55% 45% at 50% 75%, rgba(255, 149, 0, 0.07) 0%, transparent 50%),
+    radial-gradient(ellipse 40% 40% at 25% 80%, rgba(52, 199, 89, 0.06) 0%, transparent 45%),
+    linear-gradient(160deg, #F2F1F6 0%, #E8E4F0 25%, #DEE8F5 50%, #F0EBE5 75%, #F2F1F6 100%);
 }
 
-.dark .bg-mesh::before {
+.dark .bg-vivid::before {
   background:
-    radial-gradient(ellipse 80% 50% at 20% 40%, rgba(34, 216, 124, 0.06) 0%, transparent 70%),
-    radial-gradient(ellipse 60% 40% at 80% 20%, rgba(99, 102, 241, 0.04) 0%, transparent 60%),
-    radial-gradient(ellipse 50% 50% at 50% 80%, rgba(34, 216, 124, 0.03) 0%, transparent 50%);
+    radial-gradient(ellipse 60% 50% at 15% 25%, rgba(10, 132, 255, 0.15) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 50% at 85% 20%, rgba(175, 82, 222, 0.10) 0%, transparent 55%),
+    radial-gradient(ellipse 55% 45% at 50% 75%, rgba(255, 159, 10, 0.06) 0%, transparent 50%),
+    radial-gradient(ellipse 40% 40% at 25% 80%, rgba(48, 209, 88, 0.05) 0%, transparent 45%),
+    linear-gradient(160deg, #000000 0%, #0A0E1A 25%, #0D1220 50%, #0A0D14 75%, #000000 100%);
 }
 
-/* Subtle dot grid pattern */
-.bg-dots::after {
-  content: '';
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  opacity: 0.3;
-  background-image: radial-gradient(circle at 1px 1px, var(--color-edge) 0.5px, transparent 0);
-  background-size: 24px 24px;
-}
+/* ================================================================
+   Liquid Glass Material
+   Translucent surface with specular highlights and depth shadows
+   ================================================================ */
 
-/* Signal glow — green */
-.glow-signal {
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur)) saturate(1.8);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.8);
+  border: 0.5px solid var(--glass-border);
   box-shadow:
-    0 0 20px rgba(34, 216, 124, 0.15),
-    0 0 60px rgba(34, 216, 124, 0.05);
+    inset 0 1px 1px 0 var(--glass-highlight),
+    inset 0 -0.5px 0 0 var(--glass-shadow-inner),
+    0 8px 32px var(--glass-shadow-drop),
+    0 2px 6px rgba(0, 0, 0, 0.03);
 }
 
-.glow-signal-strong {
+/* Heavier glass — for prominent cards, modals */
+.glass-heavy {
+  background: var(--glass-bg-heavy);
+  backdrop-filter: blur(50px) saturate(2);
+  -webkit-backdrop-filter: blur(50px) saturate(2);
+  border: 0.5px solid var(--glass-border);
   box-shadow:
-    0 0 30px rgba(34, 216, 124, 0.25),
-    0 0 80px rgba(34, 216, 124, 0.08);
+    inset 0 1.5px 1px 0 var(--glass-highlight),
+    inset 0 -0.5px 0 0 var(--glass-shadow-inner),
+    0 12px 40px var(--glass-shadow-drop),
+    0 4px 12px rgba(0, 0, 0, 0.04);
 }
 
-/* Backwards compat aliases */
-.glow-amber { box-shadow: 0 0 20px rgba(34, 216, 124, 0.15), 0 0 60px rgba(34, 216, 124, 0.05); }
-.glow-amber-strong { box-shadow: 0 0 30px rgba(34, 216, 124, 0.25), 0 0 80px rgba(34, 216, 124, 0.08); }
-
-/* Pulse animation for live indicators */
-@keyframes signal-pulse {
-  0%, 100% { opacity: 0.6; transform: scale(1); }
-  50% { opacity: 1; transform: scale(1.2); }
+/* Glass for interactive buttons */
+.glass-button {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px) saturate(1.6);
+  -webkit-backdrop-filter: blur(20px) saturate(1.6);
+  border: 0.5px solid var(--glass-border);
+  box-shadow:
+    inset 0 1px 0 0 var(--glass-highlight),
+    0 2px 8px rgba(0, 0, 0, 0.06),
+    0 1px 3px rgba(0, 0, 0, 0.03);
+  transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
-.animate-signal-pulse {
-  animation: signal-pulse 2s ease-in-out infinite;
+.glass-button:hover {
+  background: var(--glass-bg-heavy);
+  box-shadow:
+    inset 0 1px 0 0 var(--glass-highlight),
+    0 4px 16px rgba(0, 0, 0, 0.08),
+    0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+.glass-button:active {
+  transform: scale(0.97);
+  box-shadow:
+    inset 0 1px 0 0 var(--glass-highlight),
+    inset 0 2px 4px rgba(0, 0, 0, 0.06),
+    0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+/* Glass inset — for input fields (looks "pressed into" the surface) */
+.glass-inset {
+  background: rgba(120, 120, 128, 0.08);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 0.5px solid rgba(0, 0, 0, 0.06);
+  box-shadow:
+    inset 0 1px 3px rgba(0, 0, 0, 0.06),
+    inset 0 0.5px 0.5px rgba(0, 0, 0, 0.04);
+}
+
+.dark .glass-inset {
+  background: rgba(120, 120, 128, 0.16);
+  border: 0.5px solid rgba(255, 255, 255, 0.06);
+  box-shadow:
+    inset 0 1px 3px rgba(0, 0, 0, 0.2),
+    inset 0 0.5px 0.5px rgba(0, 0, 0, 0.15);
+}
+
+/* Colored glass — for status badges */
+.glass-tinted {
+  backdrop-filter: blur(30px) saturate(2);
+  -webkit-backdrop-filter: blur(30px) saturate(2);
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.3),
+    inset 0 -0.5px 0 rgba(0, 0, 0, 0.1),
+    0 8px 32px var(--tint-glow, rgba(0, 0, 0, 0.1)),
+    0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* ================================================================
+   Brand glow — iOS system blue
+   ================================================================ */
+
+.glow-brand {
+  box-shadow:
+    0 0 20px rgba(0, 122, 255, 0.2),
+    0 0 60px rgba(0, 122, 255, 0.06);
+}
+
+.glow-brand-strong {
+  box-shadow:
+    0 0 30px rgba(0, 122, 255, 0.3),
+    0 0 80px rgba(0, 122, 255, 0.1);
 }
 
 /* Backwards compat */
+.glow-amber { box-shadow: 0 0 20px rgba(0, 122, 255, 0.2), 0 0 60px rgba(0, 122, 255, 0.06); }
+.glow-amber-strong { box-shadow: 0 0 30px rgba(0, 122, 255, 0.3), 0 0 80px rgba(0, 122, 255, 0.1); }
+.glow-signal { box-shadow: 0 0 20px rgba(0, 122, 255, 0.2), 0 0 60px rgba(0, 122, 255, 0.06); }
+.glow-signal-strong { box-shadow: 0 0 30px rgba(0, 122, 255, 0.3), 0 0 80px rgba(0, 122, 255, 0.1); }
+
+/* ================================================================
+   Animations
+   ================================================================ */
+
+@keyframes signal-pulse {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.15); }
+}
+
+.animate-signal-pulse { animation: signal-pulse 2s ease-in-out infinite; }
 .animate-platform-pulse { animation: signal-pulse 2s ease-in-out infinite; }
-.animate-flicker { animation: none; } /* Removed — brand text is now solid */
+.animate-flicker { animation: none; }
 
-/* Smooth fade-in for page load */
-@keyframes fade-up {
-  from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: translateY(0); }
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
 }
 
-.animate-fade-up {
-  animation: fade-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+.animate-shimmer {
+  background: linear-gradient(90deg, transparent 25%, var(--glass-highlight) 50%, transparent 75%);
+  background-size: 200% 100%;
+  animation: shimmer 2s ease-in-out infinite;
 }
 
-/* Glass card surface */
-.glass {
-  background: color-mix(in srgb, var(--color-surface) 70%, transparent);
-  backdrop-filter: blur(16px) saturate(1.2);
-  -webkit-backdrop-filter: blur(16px) saturate(1.2);
-  border: 1px solid color-mix(in srgb, var(--color-edge) 60%, transparent);
+/* Specular highlight sweep — simulates light moving across glass */
+@keyframes specular-sweep {
+  0% { opacity: 0; transform: translateX(-100%) rotate(-15deg); }
+  30% { opacity: 1; }
+  70% { opacity: 1; }
+  100% { opacity: 0; transform: translateX(100%) rotate(-15deg); }
 }
 
-/* Screen reader only */
+/* ================================================================
+   Utility
+   ================================================================ */
+
 .sr-only {
   position: absolute;
   width: 1px;
