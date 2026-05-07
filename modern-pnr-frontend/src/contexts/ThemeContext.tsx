@@ -39,7 +39,7 @@ export interface ThemeContextValue {
 }
 
 const defaultTheme: ThemeConfig = {
-  mode: 'dark',
+  mode: 'light',
   customColors: {},
   accessibility: {
     reducedMotion: false,
