@@ -5,42 +5,60 @@
 /* ================================================================
    PNR Watch — design tokens
    Tailwind v4 auto-generates utilities from these (--color-ink-2 → text-ink-2).
+   Light, lively, with one warm accent and saturated status hues.
    ================================================================ */
 
 @theme {
-  --color-paper: #FFFFFF;
-  --color-surface: #FAFAFB;
-  --color-surface-2: #F2F2F4;
+  /* Paper has a barely-there warmth so white surfaces feel layered on it. */
+  --color-paper: #FBFAF8;
+  --color-surface: #FFFFFF;
+  --color-surface-2: #F2F1ED;
+  --color-surface-tint: #F6F3FF;
 
   --color-ink: #0A0A0B;
   --color-ink-2: #5A5A60;
   --color-ink-3: #9A9AA0;
 
-  --color-rule: #E8E8EB;
-  --color-rule-strong: #D2D2D7;
+  --color-rule: #E7E5DF;
+  --color-rule-strong: #D2D0C8;
 
-  --color-accent: #0A84FF;
+  /* Accent — punchy electric blue. Used on primary CTA + active states. */
+  --color-accent: #2563EB;
+  --color-accent-2: #4F46E5;
   --color-accent-ink: #FFFFFF;
 
-  --color-success: #2BA84A;
-  --color-warning: #E08B00;
-  --color-danger: #E5484D;
-  --color-info: #0A84FF;
+  /* Status — saturated, on-brand-trip-status hues. */
+  --color-success: #15803D;
+  --color-warning: #B45309;
+  --color-danger: #B91C1C;
+  --color-info: #1D4ED8;
 
-  --color-success-soft: #E6F7EB;
-  --color-warning-soft: #FCF1DE;
-  --color-danger-soft: #FCEAEB;
-  --color-info-soft: #E0EEFF;
-  --color-neutral-soft: #F2F2F4;
+  /* Soft tints — light-mode, more saturated than before. */
+  --color-success-soft: #DCFCE7;
+  --color-warning-soft: #FEF3C7;
+  --color-danger-soft: #FEE2E2;
+  --color-info-soft: #DBEAFE;
+  --color-neutral-soft: #F1F0EC;
+
+  /* Decorative tints for galleries / category accents. */
+  --color-tint-rose: #FFE3E8;
+  --color-tint-sky: #DBEAFE;
+  --color-tint-mint: #DCFCE7;
+  --color-tint-sun: #FEF3C7;
 
   --radius-tap: 12px;
-  --radius-card: 16px;
-  --radius-sheet: 24px;
+  --radius-card: 18px;
+  --radius-sheet: 26px;
   --radius-pill: 999px;
 
-  --shadow-card: 0 1px 2px rgb(0 0 0 / 0.04), 0 4px 12px rgb(0 0 0 / 0.04);
-  --shadow-sheet: 0 -1px 0 var(--color-rule), 0 -8px 32px rgb(0 0 0 / 0.12);
+  --shadow-card: 0 1px 2px rgb(15 15 25 / 0.04), 0 8px 20px rgb(15 15 25 / 0.05);
+  --shadow-raised: 0 1px 2px rgb(15 15 25 / 0.05), 0 12px 32px rgb(15 15 25 / 0.07);
+  --shadow-sheet: 0 -1px 0 var(--color-rule), 0 -12px 40px rgb(15 15 25 / 0.14);
   --shadow-press: inset 0 0 0 999px rgb(0 0 0 / 0.04);
+
+  /* Accent glow — for the primary CTA. Soft, not loud. */
+  --shadow-accent: 0 6px 16px rgb(37 99 235 / 0.28), 0 1px 3px rgb(37 99 235 / 0.20);
+  --shadow-accent-strong: 0 10px 28px rgb(37 99 235 / 0.36), 0 2px 6px rgb(37 99 235 / 0.24);
 
   --ease-out-spring: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
@@ -49,36 +67,44 @@
   --font-mono: ui-monospace, "SF Mono", "Roboto Mono", Menlo, monospace;
 }
 
-/* Dark theme overrides — applied via .dark class on <html>.
-   Defining vars on the .dark selector preserves Tailwind v4's
-   compile-time utility generation (which only reads @theme). */
+/* Dark theme overrides — applied via .dark class on <html>. */
 .dark {
-  --color-paper: #000000;
-  --color-surface: #0D0D0F;
-  --color-surface-2: #1C1C1E;
+  --color-paper: #0B0B10;
+  --color-surface: #14141A;
+  --color-surface-2: #1F1F26;
+  --color-surface-tint: #1A1830;
 
   --color-ink: #F5F5F7;
   --color-ink-2: #B0B0B6;
   --color-ink-3: #6E6E73;
 
-  --color-rule: #1F1F22;
-  --color-rule-strong: #2C2C2E;
+  --color-rule: #25252C;
+  --color-rule-strong: #34343C;
 
-  --color-accent: #2B8FFF;
+  --color-accent: #4F8CFF;
+  --color-accent-2: #7C7CFF;
 
-  --color-success: #3FBD5C;
-  --color-warning: #F5A524;
-  --color-danger: #F26266;
-  --color-info: #2B8FFF;
+  --color-success: #4ADE80;
+  --color-warning: #FBBF24;
+  --color-danger: #F87171;
+  --color-info: #60A5FA;
 
-  --color-success-soft: rgb(63 189 92 / 0.14);
-  --color-warning-soft: rgb(245 165 36 / 0.14);
-  --color-danger-soft: rgb(242 98 102 / 0.14);
-  --color-info-soft: rgb(43 143 255 / 0.14);
-  --color-neutral-soft: #1C1C1E;
+  --color-success-soft: rgb(74 222 128 / 0.14);
+  --color-warning-soft: rgb(251 191 36 / 0.14);
+  --color-danger-soft: rgb(248 113 113 / 0.14);
+  --color-info-soft: rgb(96 165 250 / 0.14);
+  --color-neutral-soft: #1F1F26;
+
+  --color-tint-rose: rgb(255 110 130 / 0.16);
+  --color-tint-sky: rgb(80 140 255 / 0.16);
+  --color-tint-mint: rgb(80 220 130 / 0.16);
+  --color-tint-sun: rgb(255 200 70 / 0.18);
 
   --shadow-card: 0 1px 2px rgb(0 0 0 / 0.5), 0 8px 24px rgb(0 0 0 / 0.35);
-  --shadow-sheet: 0 -1px 0 var(--color-rule), 0 -8px 32px rgb(0 0 0 / 0.6);
+  --shadow-raised: 0 1px 2px rgb(0 0 0 / 0.6), 0 12px 32px rgb(0 0 0 / 0.45);
+  --shadow-sheet: 0 -1px 0 var(--color-rule), 0 -12px 40px rgb(0 0 0 / 0.6);
+  --shadow-accent: 0 6px 18px rgb(79 140 255 / 0.45), 0 1px 3px rgb(79 140 255 / 0.30);
+  --shadow-accent-strong: 0 12px 30px rgb(79 140 255 / 0.5), 0 2px 6px rgb(79 140 255 / 0.35);
 }
 
 /* ================================================================
@@ -107,11 +133,23 @@
     overflow-x: hidden;
     -webkit-tap-highlight-color: transparent;
     overscroll-behavior-y: contain;
+    background-image:
+      radial-gradient(ellipse 60% 45% at 12% 0%, rgb(37 99 235 / 0.10) 0%, transparent 60%),
+      radial-gradient(ellipse 55% 40% at 95% 12%, rgb(168 85 247 / 0.09) 0%, transparent 55%),
+      radial-gradient(ellipse 80% 60% at 50% 100%, rgb(251 191 36 / 0.07) 0%, transparent 60%);
+    background-attachment: fixed;
+  }
+
+  .dark body {
+    background-image:
+      radial-gradient(ellipse 60% 45% at 12% 0%, rgb(79 140 255 / 0.18) 0%, transparent 60%),
+      radial-gradient(ellipse 55% 40% at 95% 12%, rgb(168 85 247 / 0.18) 0%, transparent 55%),
+      radial-gradient(ellipse 80% 60% at 50% 100%, rgb(251 191 36 / 0.06) 0%, transparent 60%);
   }
 
   ::selection {
-    background: var(--color-ink);
-    color: var(--color-paper);
+    background: var(--color-accent);
+    color: var(--color-accent-ink);
   }
 
   button {
@@ -145,6 +183,22 @@
 @layer components {
   .pt-safe { padding-top: env(safe-area-inset-top); }
   .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
+
+  /* Decorative gradient swatch for the hero. */
+  .hero-spark {
+    background:
+      radial-gradient(circle at 30% 20%, rgb(37 99 235 / 0.14), transparent 60%),
+      radial-gradient(circle at 80% 50%, rgb(168 85 247 / 0.12), transparent 60%),
+      radial-gradient(circle at 50% 90%, rgb(251 191 36 / 0.10), transparent 60%);
+    filter: blur(20px);
+  }
+
+  .text-gradient-accent {
+    background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-2) 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+  }
 
   .shimmer {
     background: linear-gradient(

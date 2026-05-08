@@ -11,9 +11,8 @@
       (function () {
         try {
           var stored = JSON.parse(localStorage.getItem('theme-config') || 'null');
-          var mode = stored && stored.mode;
-          var dark = mode === 'dark' || (mode !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
-          if (dark) document.documentElement.classList.add('dark');
+          // Light by default. Only go dark if the user has explicitly chosen it.
+          if (stored && stored.mode === 'dark') document.documentElement.classList.add('dark');
         } catch (e) {}
       })();
     </script>

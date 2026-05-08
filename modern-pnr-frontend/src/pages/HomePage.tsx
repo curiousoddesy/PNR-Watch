@@ -90,11 +90,12 @@ export const HomePage: React.FC = () => {
 
       <main className="mx-auto max-w-2xl px-5 pb-32">
         {/* Hero */}
-        <section className="pt-10 pb-7">
-          <h1 className="text-[40px] sm:text-[48px] leading-[1.05] font-semibold tracking-tight">
-            Track your PNR.
+        <section className="relative pt-10 pb-7">
+          <div className="hero-spark absolute -top-6 -left-10 right-0 h-48 -z-10 pointer-events-none" aria-hidden />
+          <h1 className="text-[44px] sm:text-[56px] leading-[1.02] font-semibold tracking-tight">
+            Track your <span className="text-gradient-accent">PNR</span>.
           </h1>
-          <p className="mt-3 text-[16px] text-ink-2 tracking-tight max-w-md">
+          <p className="mt-4 text-[17px] text-ink-2 tracking-tight max-w-md">
             Enter a 10-digit number. We'll keep watch and tell you the moment anything changes.
           </p>
         </section>
@@ -147,7 +148,7 @@ export const HomePage: React.FC = () => {
                   type="button"
                   onClick={submit}
                   aria-label="Check status"
-                  className="flex items-center justify-center w-9 h-9 rounded-pill bg-ink text-paper"
+                  className="flex items-center justify-center w-10 h-10 rounded-pill bg-accent text-accent-ink shadow-[var(--shadow-accent)]"
                 >
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M5 12h14M13 5l7 7-7 7" />

@@ -16,8 +16,8 @@ interface ButtonProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>
 }
 
 const VARIANT: Record<Variant, string> = {
-  primary: 'bg-ink text-paper hover:opacity-90 disabled:opacity-30',
-  secondary: 'bg-surface-2 text-ink hover:bg-rule disabled:opacity-40',
+  primary: 'bg-accent text-accent-ink shadow-[var(--shadow-accent)] hover:shadow-[var(--shadow-accent-strong)] disabled:opacity-30 disabled:shadow-none',
+  secondary: 'bg-surface text-ink ring-1 ring-rule shadow-[var(--shadow-card)] hover:bg-surface-2 disabled:opacity-40',
   ghost: 'bg-transparent text-ink hover:bg-surface-2 disabled:opacity-40',
   destructive: 'bg-danger text-white hover:opacity-90 disabled:opacity-40',
 }

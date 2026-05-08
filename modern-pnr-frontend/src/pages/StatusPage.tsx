@@ -157,11 +157,15 @@ export const StatusPage: React.FC = () => {
             transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
             className="space-y-5"
           >
-            {/* Verdict */}
+            {/* Verdict — colored by tone for instant readability */}
             <div className="flex items-baseline justify-between gap-3 flex-wrap" aria-live="polite">
               <h1 className={cn(
-                'text-[44px] sm:text-[52px] font-semibold tracking-tight leading-[1.05]',
-                statusKey === 'CAN' || statusKey === 'FLUSHED' ? 'text-ink-2' : 'text-ink',
+                'text-[48px] sm:text-[60px] font-semibold tracking-tight leading-[1.0]',
+                statusKey === 'CNF' && 'text-success',
+                statusKey === 'RAC' && 'text-warning',
+                (statusKey === 'WL' || statusKey === 'PQWL' || statusKey === 'RLWL' || statusKey === 'GNWL') && 'text-info',
+                statusKey === 'CAN' && 'text-danger',
+                (statusKey === 'FLUSHED' || statusKey === 'Unknown') && 'text-ink-2',
               )}>
                 {statusLabel}.
               </h1>
