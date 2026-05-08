@@ -8,6 +8,11 @@
   # Build performance optimizations
   ignore = "git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF -- . ':!README.md' ':!docs/'"
 
+# Serverless functions
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+
 # Build processing and optimization
 [build.processing]
   skip_processing = false
