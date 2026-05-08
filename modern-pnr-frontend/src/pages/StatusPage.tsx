@@ -1,39 +1,45 @@
-import React from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import React, { useEffect, useState } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { motion } from 'framer-motion'
 import { usePNRStore } from '../stores/pnrStore'
 import { checkPNRStatus } from '../services/pnrService'
 import { isDemoPNR } from '../services/demoData'
+import {
+  Button,
+  IconButton,
+  ListRow,
+  PressableCard,
+  Sheet,
+  Skeleton,
+  StatusPill,
+  toneForStatus,
+} from '../components/primitives'
+import { useToastActions } from '../components/primitives'
 import { cn } from '../utils/cn'
 
 const STATUS_LABEL: Record<string, string> = {
   CNF: 'Confirmed',
   RAC: 'RAC',
   WL: 'Waitlist',
-  PQWL: 'Waitlist',
-  RLWL: 'Waitlist',
+  PQWL: 'PQ Waitlist',
+  RLWL: 'RL Waitlist',
   GNWL: 'Waitlist',
   CAN: 'Cancelled',
   FLUSHED: 'Expired',
   Unknown: 'Unknown',
 }
 
-const STATUS_TONE: Record<string, string> = {
-  CNF: 'text-ink',
-  RAC: 'text-ink',
-  WL: 'text-ink',
-  PQWL: 'text-ink',
-  RLWL: 'text-ink',
-  GNWL: 'text-ink',
-  CAN: 'text-ink-3',
-  FLUSHED: 'text-ink-3',
-  Unknown: 'text-ink-3',
-}
-
 const formatDate = (s: string) => {
-  try { return new Date(s).toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'long' }) }
-  catch { return s }
+  try {
+    return new Date(s).toLocaleDateString('en-IN', {
+      weekday: 'short',
+      day: 'numeric',
+      month: 'short',
+    })
+  } catch {
+    return s
+  }
 }
 
 const relativeDay = (s: string) => {
@@ -47,15 +53,19 @@ const relativeDay = (s: string) => {
     if (diff === -1) return 'Yesterday'
     if (diff < 0) return `${-diff} days ago`
     return null
-  } catch { return null }
+  } catch {
+    return null
+  }
 }
 
 export const StatusPage: React.FC = () => {
   const { pnrNumber } = useParams<{ pnrNumber: string }>()
   const navigate = useNavigate()
+  const [open, setOpen] = useState(true)
   const { pnrs, addPNR, removePNR } = usePNRStore()
+  const toast = useToastActions()
 
-  const { data: pnrData, isLoading, error, refetch, isFetching } = useQuery({
+  const { data, error, isLoading, isFetching, refetch } = useQuery({
     queryKey: ['pnr-status', pnrNumber],
     queryFn: () => checkPNRStatus(pnrNumber!),
     enabled: !!pnrNumber,
@@ -63,258 +73,252 @@ export const StatusPage: React.FC = () => {
     retry: 2,
   })
 
-  const isTracking = pnrs.some(p => p.number === pnrNumber)
+  const isTracking = pnrs.some((p) => p.number === pnrNumber)
   const isDemo = !!pnrNumber && isDemoPNR(pnrNumber)
+  const status = data?.status
+  const statusKey = status?.currentStatus.split('/')[0] ?? 'Unknown'
+  const statusLabel = STATUS_LABEL[statusKey] ?? statusKey
+  const dayLabel = data ? relativeDay(data.dateOfJourney) : null
 
-  const handleTrackToggle = () => {
-    if (!pnrData) return
-    isTracking ? removePNR(pnrData.id) : addPNR(pnrData)
+  // Close → navigate back
+  const close = () => {
+    setOpen(false)
+    setTimeout(() => navigate(-1), 250)
   }
 
-  const status = pnrData?.status
-  const statusKey = status?.currentStatus ?? 'Unknown'
-  const statusLabel = STATUS_LABEL[statusKey] ?? statusKey
-  const dayLabel = pnrData ? relativeDay(pnrData.dateOfJourney) : null
+  // If user came directly to this URL with no history, replace -1 with /
+  useEffect(() => {
+    return () => { /* no-op */ }
+  }, [])
+
+  const handleTrack = () => {
+    if (!data) return
+    if (isTracking) {
+      removePNR(data.id)
+      toast.info('Stopped tracking', `${data.number}`)
+    } else {
+      addPNR(data)
+      toast.success('Tracking', 'We\'ll watch this PNR every five minutes.')
+    }
+  }
 
   return (
-    <div className="pt-8 pb-24 fade-up">
-      <button
-        onClick={() => navigate('/')}
-        className="link inline-flex items-center gap-2 text-[14px] font-medium text-ink-2 mb-12"
-      >
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M19 12H5M12 19l-7-7 7-7" />
-        </svg>
-        Back
-      </button>
-
-      {isLoading && (
-        <div className="space-y-12 animate-pulse">
-          <div className="h-3 w-16 bg-rule rounded-full" />
-          <div className="h-20 w-3/4 bg-rule rounded-md" />
-          <div className="h-px bg-rule" />
-          <div className="space-y-3">
-            <div className="h-3 w-20 bg-rule rounded-full" />
-            <div className="h-5 w-1/2 bg-rule rounded-md" />
+    <Sheet open={open} onClose={close} ariaLabel={`Status for PNR ${pnrNumber}`}>
+      <div className="px-5 pt-2 pb-8">
+        {/* Header */}
+        <div className="flex items-start justify-between gap-3 mb-5">
+          <div className="min-w-0">
+            <p className="text-[11px] font-semibold tracking-[0.18em] uppercase text-ink-3">PNR</p>
+            <p className="font-mono text-[20px] tracking-[0.06em] text-ink mt-0.5 truncate">
+              {pnrNumber}
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            {isDemo && (
+              <span className="text-[10px] tracking-[0.16em] uppercase text-ink-3 px-2 h-5 flex items-center border border-rule rounded-pill">
+                Sample
+              </span>
+            )}
+            <IconButton aria-label="Close" size="sm" onClick={close}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M18 6L6 18M6 6l12 12" />
+              </svg>
+            </IconButton>
           </div>
         </div>
-      )}
 
-      {error && !isLoading && (
-        <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="py-16"
-        >
-          <p className="type-eyebrow mb-4">PNR · {pnrNumber}</p>
-          <h2 className="type-display text-ink mb-4" style={{ fontSize: 'clamp(36px, 6vw, 56px)' }}>
-            We couldn't reach this one.
-          </h2>
-          <p className="text-[16px] text-ink-2 max-w-md mb-10 tracking-tight">
-            {error instanceof Error ? error.message : 'Please try again in a moment.'}
-          </p>
-          <div className="flex items-center gap-4">
-            <button onClick={() => refetch()} className="btn-primary">
-              Try again
-            </button>
-            <button onClick={() => navigate('/')} className="link text-[14px] font-medium text-ink-2">
-              Back to search
-            </button>
+        {isLoading && (
+          <div className="space-y-4">
+            <Skeleton h={36} w="60%" />
+            <Skeleton h={120} radius={16} />
+            <Skeleton h={64} radius={16} />
+            <Skeleton h={64} radius={16} />
           </div>
-        </motion.div>
-      )}
+        )}
 
-      {pnrData && status && !isLoading && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5 }}
-        >
-          {/* Verdict */}
-          <motion.section
-            initial={{ opacity: 0, y: 8 }}
+        {error && !isLoading && (
+          <div className="py-6">
+            <p className="text-[11px] font-semibold tracking-[0.18em] uppercase text-danger mb-2">Error</p>
+            <h2 className="text-[24px] font-semibold tracking-tight mb-2">We couldn't reach this one.</h2>
+            <p className="text-[14px] text-ink-2 tracking-tight mb-6">
+              {error instanceof Error ? error.message : 'Please try again in a moment.'}
+            </p>
+            <div className="flex gap-3">
+              <Button onClick={() => refetch()}>Try again</Button>
+              <Button variant="ghost" onClick={close}>Back</Button>
+            </div>
+          </div>
+        )}
+
+        {data && status && !isLoading && (
+          <motion.div
+            initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-            className="mb-20"
+            transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+            className="space-y-5"
           >
-            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mb-6">
-              <p className="type-eyebrow">PNR</p>
-              <span className="type-mono text-[13px] text-ink-2 tracking-wider">{pnrNumber}</span>
-              {isDemo && (
-                <span className="text-[10px] tracking-[0.16em] uppercase text-ink-3 px-2 py-0.5 border border-rule rounded-full">
-                  Sample
-                </span>
-              )}
-              {status.chartPrepared && (
-                <>
-                  <span className="text-ink-3">·</span>
-                  <span className="text-[12px] text-ink-2 tracking-tight">Chart prepared</span>
-                </>
-              )}
+            {/* Verdict */}
+            <div className="flex items-baseline justify-between gap-3 flex-wrap" aria-live="polite">
+              <h1 className={cn(
+                'text-[44px] sm:text-[52px] font-semibold tracking-tight leading-[1.05]',
+                statusKey === 'CAN' || statusKey === 'FLUSHED' ? 'text-ink-2' : 'text-ink',
+              )}>
+                {statusLabel}.
+              </h1>
+              <StatusPill tone={toneForStatus(status.currentStatus)}>
+                {status.currentStatus}
+              </StatusPill>
             </div>
 
-            <h1
-              className={cn('type-display', STATUS_TONE[statusKey] ?? 'text-ink')}
-              style={{ fontSize: 'clamp(56px, 13vw, 132px)' }}
-            >
-              {statusLabel}.
-            </h1>
-
-            {pnrData.passengerName && pnrData.passengerName !== 'Passenger' && (
-              <p className="mt-6 text-[18px] text-ink-2 tracking-tight">
-                For <span className="text-ink">{pnrData.passengerName}</span>
+            {data.passengerName && data.passengerName !== 'Passenger' && (
+              <p className="text-[15px] text-ink-2 tracking-tight">
+                For <span className="text-ink">{data.passengerName}</span>
                 {status.passengers.length > 1 && ` and ${status.passengers.length - 1} more`}.
               </p>
             )}
-          </motion.section>
 
-          {/* Journey */}
-          <motion.section
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
-            className="mb-16"
-          >
-            <div className="flex items-baseline justify-between mb-8">
-              <p className="type-eyebrow">Journey</p>
-              {dayLabel && (
-                <p className="text-[13px] text-ink-2 tracking-tight">{dayLabel}</p>
-              )}
-            </div>
-
-            <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)] gap-6 sm:gap-12 items-end">
-              <div>
-                <p className="type-eyebrow mb-2 text-[10px]">From</p>
-                <p className="type-headline text-ink truncate" style={{ fontSize: 'clamp(28px, 4.5vw, 44px)' }}>
-                  {pnrData.from || '—'}
-                </p>
-                <p className="type-mono text-[14px] text-ink-2 mt-2 tracking-wider">
-                  {status.trainInfo.departureTime || '--:--'}
-                </p>
+            {status.chartPrepared && (
+              <div className="inline-flex items-center gap-1.5 px-2.5 h-6 rounded-pill bg-success-soft text-success text-[11px] font-semibold tracking-wide uppercase">
+                <span className="block w-1.5 h-1.5 rounded-full bg-success" />
+                Chart prepared
               </div>
+            )}
 
-              <div className="text-right">
-                <p className="type-eyebrow mb-2 text-[10px]">To</p>
-                <p className="type-headline text-ink truncate" style={{ fontSize: 'clamp(28px, 4.5vw, 44px)' }}>
-                  {pnrData.to || '—'}
-                </p>
-                <p className="type-mono text-[14px] text-ink-2 mt-2 tracking-wider">
-                  {status.trainInfo.arrivalTime || '--:--'}
-                </p>
-              </div>
-            </div>
-
-            {/* Route line — quiet, with a single dot. */}
-            <div className="relative mt-10 mb-8 h-[2px] bg-rule">
-              <div className="absolute left-0 -top-[3px] w-2 h-2 rounded-full bg-ink" />
-              <div className="absolute right-0 -top-[3px] w-2 h-2 rounded-full bg-ink" />
-              {status.trainInfo.duration && (
-                <div className="absolute left-1/2 -translate-x-1/2 -top-3 px-3 bg-paper">
-                  <span className="text-[11px] text-ink-2 tracking-tight">{status.trainInfo.duration}</span>
+            {/* Train + journey card */}
+            <PressableCard elevation="raised" className="p-5">
+              <div className="flex items-center justify-between mb-4">
+                <div className="min-w-0">
+                  <p className="text-[14px] text-ink truncate font-medium tracking-tight">
+                    {data.trainName}
+                  </p>
+                  <p className="font-mono text-[12px] text-ink-2 mt-0.5 tracking-wider">
+                    {data.trainNumber}
+                  </p>
                 </div>
-              )}
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-6 gap-x-12">
-              <Detail label="Train" value={
-                <>
-                  <span className="type-mono text-ink mr-2">{pnrData.trainNumber}</span>
-                  <span className="text-ink-2">{pnrData.trainName}</span>
-                </>
-              } />
-              <Detail label="Date" value={formatDate(pnrData.dateOfJourney)} />
-              {pnrData.class && pnrData.class !== '—' && <Detail label="Class" value={pnrData.class} />}
-              {pnrData.quota && <Detail label="Quota" value={pnrData.quota} />}
-              {status.trainInfo.distance && <Detail label="Distance" value={status.trainInfo.distance} />}
-            </div>
-          </motion.section>
-
-          {/* Passengers */}
-          {status.passengers.length > 0 && (
-            <motion.section
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.14, ease: [0.22, 1, 0.36, 1] }}
-              className="mb-16"
-            >
-              <div className="flex items-baseline justify-between mb-4">
-                <p className="type-eyebrow">Passengers</p>
-                <span className="type-mono text-[12px] text-ink-3">{status.passengers.length}</span>
+                {dayLabel && (
+                  <span className="text-[12px] text-ink-2 tracking-tight whitespace-nowrap">
+                    {dayLabel}
+                  </span>
+                )}
               </div>
 
-              <ul className="border-t border-rule">
-                {status.passengers.map((passenger, i) => {
-                  const pStatus = passenger.currentStatus
-                  const seat = [passenger.coachPosition, passenger.seatNumber].filter(Boolean).join(' · ')
-                  const isFinal = pStatus.startsWith('CNF') || pStatus.startsWith('RAC')
-                  return (
-                    <li key={i} className="border-b border-rule">
-                      <div className="grid grid-cols-[auto_1fr_auto] gap-4 items-center py-5">
-                        <span className="type-mono text-[13px] text-ink-3 w-6">
-                          {String(i + 1).padStart(2, '0')}
-                        </span>
-                        <div>
-                          <p className="text-[16px] text-ink tracking-tight">
-                            {passenger.name || `Passenger ${i + 1}`}
-                          </p>
-                          <p className="text-[12px] text-ink-3 mt-0.5 tracking-tight">
-                            {seat
-                              ? <>Seat <span className="type-mono text-ink-2">{seat}</span></>
-                              : passenger.bookingStatus && passenger.bookingStatus !== pStatus
-                                ? <>Booked as <span className="type-mono">{passenger.bookingStatus}</span></>
-                                : 'Awaiting allocation'}
-                          </p>
-                        </div>
-                        <div className="text-right">
-                          <p className={cn(
-                            'type-mono text-[14px] tracking-wider',
-                            isFinal ? 'text-ink' : 'text-ink-2'
-                          )}>
-                            {pStatus}
-                          </p>
-                        </div>
-                      </div>
-                    </li>
-                  )
-                })}
-              </ul>
-            </motion.section>
-          )}
+              {/* Stations */}
+              <div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-3">
+                <div>
+                  <p className="text-[20px] font-semibold tracking-tight truncate">{data.from}</p>
+                  <p className="font-mono text-[13px] text-ink-2 mt-1 tracking-wider">
+                    {status.trainInfo.departureTime || '--:--'}
+                  </p>
+                </div>
+                <div className="flex flex-col items-center justify-center min-w-12">
+                  <div className="relative w-full flex items-center">
+                    <span className="block w-1.5 h-1.5 rounded-full bg-ink-3" />
+                    <span className="flex-1 h-px bg-rule" />
+                    <span className="block w-1.5 h-1.5 rounded-full bg-ink-3" />
+                  </div>
+                  {status.trainInfo.duration && (
+                    <span className="text-[10px] text-ink-3 tracking-tight mt-1.5">
+                      {status.trainInfo.duration}
+                    </span>
+                  )}
+                </div>
+                <div className="text-right">
+                  <p className="text-[20px] font-semibold tracking-tight truncate">{data.to}</p>
+                  <p className="font-mono text-[13px] text-ink-2 mt-1 tracking-wider">
+                    {status.trainInfo.arrivalTime || '--:--'}
+                  </p>
+                </div>
+              </div>
 
-          {/* Action */}
-          <motion.section
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.6, delay: 0.18 }}
-            className="flex items-center justify-between gap-4 pt-2"
-          >
-            <button onClick={handleTrackToggle} className="btn-primary">
-              {isTracking ? 'Stop tracking' : 'Track this trip'}
-            </button>
-            <button
-              onClick={() => refetch()}
-              disabled={isFetching}
-              className="link inline-flex items-center gap-2 text-[14px] font-medium text-ink-2"
-            >
-              <svg
-                width="14" height="14" viewBox="0 0 24 24" fill="none"
-                stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"
-                className={isFetching ? 'animate-spin' : ''}
+              {/* Meta row */}
+              <div className="flex items-center gap-x-4 gap-y-1 flex-wrap mt-4 pt-4 border-t border-rule text-[12px] text-ink-2 tracking-tight">
+                <span>{formatDate(data.dateOfJourney)}</span>
+                {data.class && data.class !== '—' && (
+                  <>
+                    <span className="text-ink-3">·</span>
+                    <span>{data.class}</span>
+                  </>
+                )}
+                {data.quota && (
+                  <>
+                    <span className="text-ink-3">·</span>
+                    <span>Quota {data.quota}</span>
+                  </>
+                )}
+                {status.trainInfo.distance && (
+                  <>
+                    <span className="text-ink-3">·</span>
+                    <span>{status.trainInfo.distance}</span>
+                  </>
+                )}
+              </div>
+            </PressableCard>
+
+            {/* Passengers */}
+            {status.passengers.length > 0 && (
+              <section>
+                <div className="flex items-baseline justify-between mb-2 px-1">
+                  <h3 className="text-[11px] font-semibold tracking-[0.18em] uppercase text-ink-3">Passengers</h3>
+                  <span className="text-[11px] text-ink-3 font-mono">{status.passengers.length}</span>
+                </div>
+                <PressableCard elevation="raised">
+                  {status.passengers.map((p, i) => {
+                    const seat = [p.coachPosition, p.seatNumber].filter(Boolean).join(' · ')
+                    return (
+                      <ListRow
+                        key={i}
+                        leading={
+                          <span className="font-mono text-[12px] text-ink-3 w-6 inline-block text-center">
+                            {String(i + 1).padStart(2, '0')}
+                          </span>
+                        }
+                        title={p.name || `Passenger ${i + 1}`}
+                        subtitle={
+                          seat
+                            ? `Seat ${seat}`
+                            : p.bookingStatus && p.bookingStatus !== p.currentStatus
+                              ? `Booked as ${p.bookingStatus}`
+                              : 'Awaiting allocation'
+                        }
+                        trailing={
+                          <StatusPill tone={toneForStatus(p.currentStatus)} size="sm">
+                            {p.currentStatus}
+                          </StatusPill>
+                        }
+                      />
+                    )
+                  })}
+                </PressableCard>
+              </section>
+            )}
+
+            {/* Action footer */}
+            <div className="flex items-center justify-between gap-3 pt-2">
+              <Button
+                variant={isTracking ? 'secondary' : 'primary'}
+                size="lg"
+                onClick={handleTrack}
+                fullWidth
               >
-                <path d="M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5" />
-              </svg>
-              {isFetching ? 'Refreshing' : 'Refresh'}
-            </button>
-          </motion.section>
-        </motion.div>
-      )}
-    </div>
+                {isTracking ? 'Stop tracking' : 'Track this trip'}
+              </Button>
+              <IconButton
+                aria-label="Refresh"
+                onClick={() => refetch()}
+                disabled={isFetching}
+              >
+                <svg
+                  width="18" height="18" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"
+                  className={isFetching ? 'animate-spin' : ''}
+                >
+                  <path d="M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5" />
+                </svg>
+              </IconButton>
+            </div>
+          </motion.div>
+        )}
+      </div>
+    </Sheet>
   )
 }
-
-const Detail: React.FC<{ label: string; value: React.ReactNode }> = ({ label, value }) => (
-  <div>
-    <p className="type-eyebrow mb-1.5 text-[10px]">{label}</p>
-    <p className="text-[15px] text-ink tracking-tight">{value}</p>
-  </div>
-)

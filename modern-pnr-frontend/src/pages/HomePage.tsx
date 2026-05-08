@@ -1,332 +1,276 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { Suspense, lazy, useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { usePNRStore } from '../stores/pnrStore'
 import { DEMO_PNRS } from '../services/demoData'
+import { useThemeContext } from '../contexts/ThemeContext'
+import {
+  AppBar,
+  Button,
+  IconButton,
+  ListRow,
+  PressableCard,
+  Sheet,
+  StatusPill,
+  toneForStatus,
+} from '../components/primitives'
 import { cn } from '../utils/cn'
+
+const QRScanner = lazy(() => import('../components/qr/QRScanner'))
+
+const isDesktop = () =>
+  typeof window !== 'undefined' && window.matchMedia('(min-width: 768px)').matches
 
 export const HomePage: React.FC = () => {
   const [pnr, setPnr] = useState('')
-  const [showScanner, setShowScanner] = useState(false)
+  const [scanOpen, setScanOpen] = useState(false)
   const [isFocused, setIsFocused] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
   const navigate = useNavigate()
-  const { recentQueries } = usePNRStore()
+  const { recentQueries, pnrs } = usePNRStore()
+  const { currentMode, setThemeMode } = useThemeContext()
 
   useEffect(() => {
-    inputRef.current?.focus()
+    if (isDesktop()) inputRef.current?.focus()
   }, [])
 
   const isValid = /^\d{10}$/.test(pnr)
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (isValid) {
-      usePNRStore.getState().addToRecent(pnr)
-      navigate(`/status/${pnr}`)
+  const submit = () => {
+    if (!isValid) return
+    usePNRStore.getState().addToRecent(pnr)
+    navigate(`/status/${pnr}`)
+  }
+
+  const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const v = e.target.value.replace(/\D/g, '').slice(0, 10)
+    setPnr(v)
+  }
+
+  const onScan = (text: string) => {
+    setScanOpen(false)
+    const digits = text.replace(/\D/g, '').slice(0, 10)
+    if (digits.length === 10) {
+      usePNRStore.getState().addToRecent(digits)
+      navigate(`/status/${digits}`)
+    } else {
+      setPnr(digits)
+      inputRef.current?.focus()
     }
   }
-
-  const handleRecentClick = (pnrNumber: string) => {
-    usePNRStore.getState().addToRecent(pnrNumber)
-    navigate(`/status/${pnrNumber}`)
-  }
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value.replace(/\D/g, '').slice(0, 10)
-    setPnr(value)
-  }
-
-  const handleDemo = () => navigate(`/status/0000000001`)
-
-  return (
-    <div className="pt-16 sm:pt-24 pb-32 fade-up">
-      {/* The headline — one phrase, room to breathe. */}
-      <section className="mb-14">
-        <p className="type-eyebrow mb-5">Live train status</p>
-        <h1
-          className="type-display text-ink"
-          style={{ fontSize: 'clamp(44px, 9vw, 88px)' }}
-        >
-          Your journey,<br />
-          <span className="text-ink-3">at a glance.</span>
-        </h1>
-        <p className="mt-5 text-[17px] leading-snug text-ink-2 max-w-md tracking-tight">
-          Enter a 10-digit PNR. We'll watch it for you and tell you the moment anything changes.
-        </p>
-      </section>
-
-      {/* The input — tactile, with an inline action. */}
-      <form onSubmit={handleSubmit} className="mb-7">
-        <label htmlFor="pnr" className="type-eyebrow block mb-3">PNR</label>
-        <div
-          className={cn(
-            'relative flex items-center gap-2 border-b transition-colors duration-300',
-            isFocused ? 'border-ink' : 'border-rule-strong'
-          )}
-        >
-          <input
-            ref={inputRef}
-            id="pnr"
-            type="text"
-            inputMode="numeric"
-            pattern="[0-9]*"
-            value={pnr}
-            onChange={handleInputChange}
-            onFocus={() => setIsFocused(true)}
-            onBlur={() => setIsFocused(false)}
-            placeholder="0000000000"
-            autoComplete="off"
-            aria-describedby="pnr-hint"
-            className={cn(
-              'flex-1 bg-transparent type-mono text-ink',
-              'border-0 rounded-none pl-0 py-4 focus:outline-none focus:ring-0',
-              'placeholder:text-ink-3/50'
-            )}
-            style={{ fontSize: 'clamp(28px, 4.5vw, 40px)', letterSpacing: '0.04em' }}
-          />
-
-          <AnimatePresence>
-            {pnr.length > 0 && pnr.length < 10 && (
-              <motion.button
-                key="clear"
-                initial={{ opacity: 0, scale: 0.6 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.6 }}
-                transition={{ duration: 0.15 }}
-                type="button"
-                onClick={() => { setPnr(''); inputRef.current?.focus() }}
-                className="btn-icon"
-                aria-label="Clear"
-              >
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M18 6L6 18M6 6l12 12" />
-                </svg>
-              </motion.button>
-            )}
-          </AnimatePresence>
-
-          {/* Submit — circular, slides in when valid. */}
-          <AnimatePresence>
-            {isValid && (
-              <motion.button
-                key="submit"
-                initial={{ opacity: 0, scale: 0.6, x: 8 }}
-                animate={{ opacity: 1, scale: 1, x: 0 }}
-                exit={{ opacity: 0, scale: 0.6, x: 8 }}
-                transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
-                type="submit"
-                aria-label="Check status"
-                className="flex items-center justify-center w-11 h-11 rounded-full bg-ink text-paper transition-transform active:scale-95"
-              >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M5 12h14M13 5l7 7-7 7" />
-                </svg>
-              </motion.button>
-            )}
-          </AnimatePresence>
-        </div>
-
-        {/* Live progress + helper hints, replacing static text. */}
-        <div id="pnr-hint" className="flex items-center justify-between mt-3 h-5">
-          <div className="flex items-center gap-1.5">
-            {Array.from({ length: 10 }).map((_, i) => (
-              <span
-                key={i}
-                className={cn(
-                  'h-[3px] w-3 rounded-full transition-colors duration-200',
-                  i < pnr.length ? 'bg-ink' : 'bg-rule'
-                )}
-              />
-            ))}
-          </div>
-          <p className="text-[12px] text-ink-3 tracking-tight">
-            {pnr.length === 0
-              ? '10 digits'
-              : pnr.length < 10
-                ? `${10 - pnr.length} more`
-                : 'Press ↵ to check'}
-          </p>
-        </div>
-      </form>
-
-      {/* Secondary actions — quiet, equal weight. */}
-      <div className="flex items-center gap-6 text-[14px] font-medium text-ink-2">
-        <button
-          type="button"
-          onClick={() => setShowScanner(true)}
-          className="link inline-flex items-center gap-2"
-        >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2" />
-            <path d="M7 12h10" />
-          </svg>
-          Scan ticket
-        </button>
-        <button
-          type="button"
-          onClick={handleDemo}
-          className="link inline-flex items-center gap-2"
-        >
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-            <polygon points="5 3 19 12 5 21 5 3" />
-          </svg>
-          See a demo
-        </button>
-      </div>
-
-      {/* Recent — quiet hairline list. */}
-      <AnimatePresence>
-        {recentQueries.length > 0 && (
-          <motion.section
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
-            className="mt-24"
-          >
-            <p className="type-eyebrow mb-4">Recent</p>
-            <ul className="border-t border-rule">
-              {recentQueries.slice(0, 5).map((recent) => (
-                <li key={recent} className="border-b border-rule">
-                  <button
-                    onClick={() => handleRecentClick(recent)}
-                    className="group w-full flex items-center justify-between py-5 text-left transition-opacity hover:opacity-60"
-                  >
-                    <span className="type-mono text-[18px] text-ink tracking-wider">
-                      {recent}
-                    </span>
-                    <svg
-                      width="16" height="16" viewBox="0 0 24 24" fill="none"
-                      stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"
-                      className="text-ink-3 transition-transform duration-200 group-hover:translate-x-1"
-                    >
-                      <path d="M5 12h14M13 5l7 7-7 7" />
-                    </svg>
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </motion.section>
-        )}
-      </AnimatePresence>
-
-      {/* Demo gallery — only visible if no recents, to avoid noise. */}
-      {recentQueries.length === 0 && (
-        <motion.section
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
-          className="mt-28"
-        >
-          <p className="type-eyebrow mb-4">Try one</p>
-          <ul className="border-t border-rule">
-            {Object.values(DEMO_PNRS).map((sample) => (
-              <li key={sample.id} className="border-b border-rule">
-                <button
-                  onClick={() => navigate(`/status/${sample.number}`)}
-                  className="group w-full flex items-center justify-between py-5 text-left transition-opacity hover:opacity-60"
-                >
-                  <div>
-                    <p className="text-[16px] text-ink tracking-tight">
-                      {sample.trainName}
-                      <span className="text-ink-3 font-normal"> · {sample.from} → {sample.to}</span>
-                    </p>
-                    <p className="text-[12px] text-ink-3 mt-0.5 tracking-tight">
-                      Sample · {sample.status.currentStatus.startsWith('WL') ? 'Waitlist' : sample.status.currentStatus.startsWith('RAC') ? 'RAC' : 'Confirmed'}
-                    </p>
-                  </div>
-                  <svg
-                    width="16" height="16" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"
-                    className="text-ink-3 transition-transform duration-200 group-hover:translate-x-1"
-                  >
-                    <path d="M5 12h14M13 5l7 7-7 7" />
-                  </svg>
-                </button>
-              </li>
-            ))}
-          </ul>
-        </motion.section>
-      )}
-
-      {showScanner && (
-        <QRScannerModal
-          onScan={(result) => {
-            setShowScanner(false)
-            const digits = result.replace(/\D/g, '').slice(0, 10)
-            if (digits.length === 10) {
-              usePNRStore.getState().addToRecent(digits)
-              navigate(`/status/${digits}`)
-            } else {
-              setPnr(digits)
-              inputRef.current?.focus()
-            }
-          }}
-          onClose={() => setShowScanner(false)}
-        />
-      )}
-    </div>
-  )
-}
-
-const QRScannerModal: React.FC<{
-  onScan: (result: string) => void
-  onClose: () => void
-}> = ({ onScan, onClose }) => {
-  const scannerRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    let scanner: any = null
-
-    const init = async () => {
-      try {
-        const { Html5QrcodeScanner, Html5QrcodeScanType } = await import('html5-qrcode')
-        scanner = new Html5QrcodeScanner('qr-reader', {
-          fps: 10,
-          qrbox: { width: 250, height: 250 },
-          supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA]
-        }, false)
-        scanner.render(
-          (text: string) => { scanner?.clear().catch(() => {}); onScan(text) },
-          () => {}
-        )
-      } catch {
-        // Camera unavailable
-      }
-    }
-
-    init()
-    return () => { scanner?.clear().catch(() => {}) }
-  }, [onScan])
 
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-paper/95 backdrop-blur-sm"
-      onClick={(e) => e.target === e.currentTarget && onClose()}
+      transition={{ duration: 0.2 }}
     >
-      <motion.div
-        initial={{ y: 40, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        exit={{ y: 40, opacity: 0 }}
-        transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-        className="w-full max-w-md bg-paper border border-rule rounded-3xl p-8 mx-4 mb-4"
-      >
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <p className="type-eyebrow mb-1">Scan</p>
-            <h2 className="type-headline text-[22px] text-ink">QR code from your ticket</h2>
+      <AppBar
+        title="PNR Watch"
+        trailing={
+          <IconButton
+            aria-label={`Switch to ${currentMode === 'dark' ? 'light' : 'dark'} mode`}
+            onClick={() => setThemeMode(currentMode === 'dark' ? 'light' : 'dark')}
+            size="sm"
+          >
+            {currentMode === 'dark' ? (
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="4" />
+                <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" />
+              </svg>
+            ) : (
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+              </svg>
+            )}
+          </IconButton>
+        }
+      />
+
+      <main className="mx-auto max-w-2xl px-5 pb-32">
+        {/* Hero */}
+        <section className="pt-10 pb-7">
+          <h1 className="text-[40px] sm:text-[48px] leading-[1.05] font-semibold tracking-tight">
+            Track your PNR.
+          </h1>
+          <p className="mt-3 text-[16px] text-ink-2 tracking-tight max-w-md">
+            Enter a 10-digit number. We'll keep watch and tell you the moment anything changes.
+          </p>
+        </section>
+
+        {/* Input card */}
+        <PressableCard elevation="raised" className="p-1.5">
+          <div
+            className={cn(
+              'flex items-center gap-2 px-4 rounded-[14px] transition-colors duration-150',
+              isFocused ? 'bg-surface-2' : 'bg-transparent',
+            )}
+          >
+            <input
+              ref={inputRef}
+              type="text"
+              inputMode="numeric"
+              pattern="[0-9]*"
+              value={pnr}
+              onChange={handleInput}
+              onFocus={() => setIsFocused(true)}
+              onBlur={() => setIsFocused(false)}
+              onKeyDown={(e) => e.key === 'Enter' && submit()}
+              placeholder="0000000000"
+              autoComplete="off"
+              aria-label="PNR number"
+              className="flex-1 bg-transparent border-0 outline-none focus:ring-0 py-4 font-mono text-[26px] sm:text-[28px] tracking-[0.06em] text-ink placeholder:text-ink-3/60"
+            />
+            <AnimatePresence>
+              {pnr.length > 0 && pnr.length < 10 && (
+                <motion.div key="clear" initial={{ opacity: 0, scale: 0.6 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.6 }} transition={{ duration: 0.12 }}>
+                  <IconButton
+                    aria-label="Clear"
+                    size="sm"
+                    onClick={() => { setPnr(''); inputRef.current?.focus() }}
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M18 6L6 18M6 6l12 12" />
+                    </svg>
+                  </IconButton>
+                </motion.div>
+              )}
+              {isValid && (
+                <motion.button
+                  key="go"
+                  initial={{ opacity: 0, scale: 0.6 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.6 }}
+                  transition={{ duration: 0.16, ease: [0.22, 1, 0.36, 1] }}
+                  whileTap={{ scale: 0.92 }}
+                  type="button"
+                  onClick={submit}
+                  aria-label="Check status"
+                  className="flex items-center justify-center w-9 h-9 rounded-pill bg-ink text-paper"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M5 12h14M13 5l7 7-7 7" />
+                  </svg>
+                </motion.button>
+              )}
+            </AnimatePresence>
           </div>
-          <button onClick={onClose} className="btn-icon" aria-label="Close">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M18 6L6 18M6 6l12 12" />
-            </svg>
-          </button>
+        </PressableCard>
+
+        {/* Progress + hint row */}
+        <div className="flex items-center justify-between mt-3 px-1.5 h-5">
+          <div className="flex items-center gap-1.5" aria-hidden>
+            {Array.from({ length: 10 }).map((_, i) => (
+              <span
+                key={i}
+                className={cn(
+                  'h-[3px] w-3 rounded-pill transition-colors duration-200',
+                  i < pnr.length ? 'bg-ink' : 'bg-rule-strong',
+                )}
+              />
+            ))}
+          </div>
+          <p className="text-[12px] text-ink-2 tracking-tight" aria-live="polite">
+            {pnr.length === 0 ? '10 digits' : pnr.length < 10 ? `${10 - pnr.length} to go` : 'Ready'}
+          </p>
         </div>
-        <div id="qr-reader" ref={scannerRef} className="w-full rounded-2xl overflow-hidden" />
-      </motion.div>
+
+        {/* Secondary actions */}
+        <div className="flex items-center gap-3 mt-6">
+          <Button
+            variant="secondary"
+            size="md"
+            onClick={() => setScanOpen(true)}
+            leading={
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2" />
+                <path d="M7 12h10" />
+              </svg>
+            }
+          >
+            Scan ticket
+          </Button>
+          <Button
+            variant="ghost"
+            size="md"
+            onClick={() => navigate('/tracking')}
+            leading={
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M3 7l9-4 9 4M3 7v10l9 4 9-4V7M3 7l9 4M21 7l-9 4M12 11v10" />
+              </svg>
+            }
+          >
+            Trips{pnrs.length > 0 ? ` · ${pnrs.length}` : ''}
+          </Button>
+        </div>
+
+        {/* Recent */}
+        {recentQueries.length > 0 && (
+          <section className="mt-12">
+            <h2 className="text-[11px] font-semibold tracking-[0.18em] uppercase text-ink-3 mb-3 px-2">
+              Recent
+            </h2>
+            <PressableCard elevation="raised">
+              {recentQueries.slice(0, 5).map((recent) => (
+                <ListRow
+                  key={recent}
+                  title={<span className="font-mono tracking-wider text-[16px]">{recent}</span>}
+                  trailing={
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M9 6l6 6-6 6" />
+                    </svg>
+                  }
+                  onPress={() => {
+                    usePNRStore.getState().addToRecent(recent)
+                    navigate(`/status/${recent}`)
+                  }}
+                />
+              ))}
+            </PressableCard>
+          </section>
+        )}
+
+        {/* Demo gallery — when no recents */}
+        {recentQueries.length === 0 && (
+          <section className="mt-12">
+            <h2 className="text-[11px] font-semibold tracking-[0.18em] uppercase text-ink-3 mb-3 px-2">
+              Try a sample
+            </h2>
+            <PressableCard elevation="raised">
+              {Object.values(DEMO_PNRS).map((sample) => (
+                <ListRow
+                  key={sample.id}
+                  title={
+                    <span className="text-[15px]">
+                      {sample.trainName}
+                      <span className="text-ink-3 font-normal"> · {sample.from} → {sample.to}</span>
+                    </span>
+                  }
+                  subtitle={`Sample · ${sample.dateOfJourney.slice(0, 10)}`}
+                  trailing={<StatusPill tone={toneForStatus(sample.status.currentStatus)} size="sm">{sample.status.currentStatus.split('/')[0]}</StatusPill>}
+                  onPress={() => navigate(`/status/${sample.number}`)}
+                />
+              ))}
+            </PressableCard>
+          </section>
+        )}
+      </main>
+
+      {/* Scan sheet */}
+      <Sheet open={scanOpen} onClose={() => setScanOpen(false)} ariaLabel="Scan QR code from your ticket">
+        <div className="px-5 pt-2 pb-6">
+          <h2 className="text-[20px] font-semibold tracking-tight">Scan a ticket QR</h2>
+          <p className="text-[13px] text-ink-2 tracking-tight mt-1">
+            Position the QR code from your booking inside the frame.
+          </p>
+          <div className="mt-5">
+            <Suspense fallback={<div className="h-64 rounded-card bg-surface-2" />}>
+              {scanOpen && <QRScanner onScan={onScan} />}
+            </Suspense>
+          </div>
+        </div>
+      </Sheet>
     </motion.div>
   )
 }

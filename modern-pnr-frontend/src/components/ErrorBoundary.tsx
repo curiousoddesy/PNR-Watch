@@ -26,9 +26,7 @@ export class ErrorBoundary extends Component<Props, State> {
     }
   }
 
-  handleReload = () => {
-    window.location.reload()
-  }
+  handleReload = () => window.location.reload()
 
   render() {
     if (this.state.hasError) {
@@ -37,21 +35,24 @@ export class ErrorBoundary extends Component<Props, State> {
       return (
         <div className="min-h-screen flex items-center bg-paper text-ink px-6">
           <div className="mx-auto max-w-md w-full">
-            <p className="type-eyebrow mb-4">Error</p>
-            <h1 className="type-display text-ink mb-4" style={{ fontSize: 'clamp(36px, 6vw, 56px)' }}>
+            <p className="text-[11px] font-semibold tracking-[0.18em] uppercase text-ink-3 mb-4">Error</p>
+            <h1 className="text-[40px] font-semibold tracking-tight leading-tight mb-3">
               Something broke.
             </h1>
-            <p className="text-[16px] text-ink-2 mb-10 tracking-tight">
+            <p className="text-[16px] text-ink-2 mb-8 tracking-tight">
               The page didn't load the way it should. A reload usually fixes it.
             </p>
 
             {import.meta.env.DEV && this.state.error && (
-              <pre className="mb-10 p-4 rounded-xl text-[12px] text-left overflow-auto max-h-40 type-mono text-ink-2 border border-rule">
+              <pre className="mb-8 p-4 rounded-card text-[12px] text-left overflow-auto max-h-40 font-mono text-ink-2 bg-surface border border-rule">
                 {this.state.error.message}
               </pre>
             )}
 
-            <button onClick={this.handleReload} className="btn-primary">
+            <button
+              onClick={this.handleReload}
+              className="inline-flex items-center justify-center h-11 px-6 rounded-pill bg-ink text-paper font-medium tracking-tight hover:opacity-90 transition-opacity"
+            >
               Reload
             </button>
           </div>

@@ -1,33 +1,133 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
 
 /* ================================================================
-   PNR. — Designed in the spirit of less, but better.
-   Pure surfaces. Considered type. One quiet accent.
+   PNR Watch — design tokens
+   Tailwind v4 auto-generates utilities from these (--color-ink-2 → text-ink-2).
    ================================================================ */
 
-:root {
-  --paper: #FFFFFF;
-  --ink: #0A0A0B;
-  --ink-2: #6E6E73;
-  --ink-3: #A1A1A6;
-  --rule: #EAEAEC;
-  --rule-strong: #D2D2D7;
-  --tint: #1C1C1E;
-  --accent: #0071E3;
+@theme {
+  --color-paper: #FFFFFF;
+  --color-surface: #FAFAFB;
+  --color-surface-2: #F2F2F4;
+
+  --color-ink: #0A0A0B;
+  --color-ink-2: #5A5A60;
+  --color-ink-3: #9A9AA0;
+
+  --color-rule: #E8E8EB;
+  --color-rule-strong: #D2D2D7;
+
+  --color-accent: #0A84FF;
+  --color-accent-ink: #FFFFFF;
+
+  --color-success: #2BA84A;
+  --color-warning: #E08B00;
+  --color-danger: #E5484D;
+  --color-info: #0A84FF;
+
+  --color-success-soft: #E6F7EB;
+  --color-warning-soft: #FCF1DE;
+  --color-danger-soft: #FCEAEB;
+  --color-info-soft: #E0EEFF;
+  --color-neutral-soft: #F2F2F4;
+
+  --radius-tap: 12px;
+  --radius-card: 16px;
+  --radius-sheet: 24px;
+  --radius-pill: 999px;
+
+  --shadow-card: 0 1px 2px rgb(0 0 0 / 0.04), 0 4px 12px rgb(0 0 0 / 0.04);
+  --shadow-sheet: 0 -1px 0 var(--color-rule), 0 -8px 32px rgb(0 0 0 / 0.12);
+  --shadow-press: inset 0 0 0 999px rgb(0 0 0 / 0.04);
+
+  --ease-out-spring: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI Variable Text", "Roboto Flex", Roboto, system-ui, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "Roboto Mono", Menlo, monospace;
 }
 
+/* Dark theme overrides — applied via .dark class on <html>.
+   Defining vars on the .dark selector preserves Tailwind v4's
+   compile-time utility generation (which only reads @theme). */
 .dark {
-  --paper: #000000;
-  --ink: #F5F5F7;
-  --ink-2: #98989D;
-  --ink-3: #6E6E73;
-  --rule: #1C1C1E;
-  --rule-strong: #2C2C2E;
-  --tint: #F5F5F7;
-  --accent: #2997FF;
+  --color-paper: #000000;
+  --color-surface: #0D0D0F;
+  --color-surface-2: #1C1C1E;
+
+  --color-ink: #F5F5F7;
+  --color-ink-2: #B0B0B6;
+  --color-ink-3: #6E6E73;
+
+  --color-rule: #1F1F22;
+  --color-rule-strong: #2C2C2E;
+
+  --color-accent: #2B8FFF;
+
+  --color-success: #3FBD5C;
+  --color-warning: #F5A524;
+  --color-danger: #F26266;
+  --color-info: #2B8FFF;
+
+  --color-success-soft: rgb(63 189 92 / 0.14);
+  --color-warning-soft: rgb(245 165 36 / 0.14);
+  --color-danger-soft: rgb(242 98 102 / 0.14);
+  --color-info-soft: rgb(43 143 255 / 0.14);
+  --color-neutral-soft: #1C1C1E;
+
+  --shadow-card: 0 1px 2px rgb(0 0 0 / 0.5), 0 8px 24px rgb(0 0 0 / 0.35);
+  --shadow-sheet: 0 -1px 0 var(--color-rule), 0 -8px 32px rgb(0 0 0 / 0.6);
 }
+
+/* ================================================================
+   Base
+   ================================================================ */
+
+@layer base {
+  html {
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    background: var(--color-paper);
+    color: var(--color-ink);
+  }
+
+  @supports (font-variation-settings: normal) {
+    html {
+      font-feature-settings: "ss01", "cv11";
+    }
+  }
+
+  body {
+    background: var(--color-paper);
+    color: var(--color-ink);
+    overflow-x: hidden;
+    -webkit-tap-highlight-color: transparent;
+    overscroll-behavior-y: contain;
+  }
+
+  ::selection {
+    background: var(--color-ink);
+    color: var(--color-paper);
+  }
+
+  button {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  *:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+}
+
+/* ================================================================
+   Reduced motion
+   ================================================================ */
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
@@ -38,150 +138,30 @@
   }
 }
 
-html {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', system-ui, sans-serif;
-  font-feature-settings: 'cv11', 'ss01', 'ss03';
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-rendering: optimizeLegibility;
-  background: var(--paper);
-  color: var(--ink);
-}
-
-@supports (font-variation-settings: normal) {
-  html { font-family: 'Inter var', -apple-system, BlinkMacSystemFont, system-ui, sans-serif; }
-}
-
-body {
-  background: var(--paper);
-  color: var(--ink);
-  overflow-x: hidden;
-  -webkit-tap-highlight-color: transparent;
-}
-
-::selection {
-  background: var(--ink);
-  color: var(--paper);
-}
-
 /* ================================================================
-   Typography — the design.
+   Utilities reused across primitives
    ================================================================ */
 
-.type-display {
-  font-weight: 700;
-  letter-spacing: -0.045em;
-  line-height: 0.95;
+@layer components {
+  .pt-safe { padding-top: env(safe-area-inset-top); }
+  .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
+
+  .shimmer {
+    background: linear-gradient(
+      90deg,
+      var(--color-surface) 0%,
+      var(--color-surface-2) 50%,
+      var(--color-surface) 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.6s ease-in-out infinite;
+  }
+
+  @keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
 }
-
-.type-headline {
-  font-weight: 600;
-  letter-spacing: -0.025em;
-  line-height: 1.05;
-}
-
-.type-mono {
-  font-family: 'SF Mono', ui-monospace, 'JetBrains Mono', Menlo, monospace;
-  font-feature-settings: 'tnum', 'zero';
-  letter-spacing: 0.01em;
-}
-
-.type-eyebrow {
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--ink-3);
-}
-
-/* ================================================================
-   Surfaces & rules
-   ================================================================ */
-
-.rule-t { border-top: 1px solid var(--rule); }
-.rule-b { border-bottom: 1px solid var(--rule); }
-.rule-y { border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
-
-/* Quiet button — text only, with underline on hover */
-.link {
-  position: relative;
-  color: var(--ink);
-  transition: opacity 200ms ease;
-}
-.link:hover { opacity: 0.6; }
-
-/* Primary action — solid pill */
-.btn-primary {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 0 24px;
-  height: 48px;
-  border-radius: 999px;
-  background: var(--ink);
-  color: var(--paper);
-  font-size: 15px;
-  font-weight: 500;
-  letter-spacing: -0.01em;
-  transition: opacity 200ms ease, transform 150ms ease;
-}
-.btn-primary:hover { opacity: 0.85; }
-.btn-primary:active { transform: scale(0.98); }
-.btn-primary:disabled { opacity: 0.2; cursor: default; }
-
-/* Secondary — outline */
-.btn-ghost {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 0 20px;
-  height: 44px;
-  border-radius: 999px;
-  color: var(--ink);
-  font-size: 14px;
-  font-weight: 500;
-  border: 1px solid var(--rule-strong);
-  background: transparent;
-  transition: background 200ms ease, border-color 200ms ease;
-}
-.btn-ghost:hover { background: var(--rule); }
-
-/* Icon button — subtle circle */
-.btn-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 999px;
-  color: var(--ink-2);
-  transition: background 200ms ease, color 200ms ease;
-}
-.btn-icon:hover { background: var(--rule); color: var(--ink); }
-
-/* ================================================================
-   Animations — quiet
-   ================================================================ */
-
-@keyframes fade-up {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.fade-up { animation: fade-up 600ms cubic-bezier(0.22, 1, 0.36, 1) both; }
-
-@keyframes pulse-soft {
-  0%, 100% { opacity: 0.4; }
-  50% { opacity: 1; }
-}
-
-.pulse-soft { animation: pulse-soft 2.4s ease-in-out infinite; }
-
-/* ================================================================
-   Utility
-   ================================================================ */
 
 .sr-only {
   position: absolute;
@@ -193,11 +173,4 @@ body {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
-}
-
-/* Hide number input spinners */
-input[type='text']::-webkit-outer-spin-button,
-input[type='text']::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
 }
