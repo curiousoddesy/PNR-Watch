@@ -62,12 +62,17 @@ export const TrackingPage: React.FC = () => {
           transition={{ duration: 0.6, delay: 0.15 }}
           className="border-t border-rule pt-12"
         >
-          <p className="text-[16px] text-ink-2 max-w-md tracking-tight mb-6">
+          <p className="text-[16px] text-ink-2 max-w-md tracking-tight mb-8">
             When you check a PNR and decide to keep an eye on it, it'll live here. Quiet, automatic, always current.
           </p>
-          <Link to="/" className="btn-primary">
-            Search a PNR
-          </Link>
+          <div className="flex items-center gap-5 flex-wrap">
+            <Link to="/" className="btn-primary">
+              Search a PNR
+            </Link>
+            <Link to="/status/0000000001" className="link text-[14px] font-medium text-ink-2">
+              See a sample trip →
+            </Link>
+          </div>
         </motion.div>
       ) : (
         <motion.ul

@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query'
 import { motion } from 'framer-motion'
 import { usePNRStore } from '../stores/pnrStore'
 import { checkPNRStatus } from '../services/pnrService'
+import { isDemoPNR } from '../services/demoData'
 import { cn } from '../utils/cn'
 
 const STATUS_LABEL: Record<string, string> = {
@@ -35,6 +36,20 @@ const formatDate = (s: string) => {
   catch { return s }
 }
 
+const relativeDay = (s: string) => {
+  try {
+    const target = new Date(s).setHours(0, 0, 0, 0)
+    const today = new Date().setHours(0, 0, 0, 0)
+    const diff = Math.round((target - today) / 86400000)
+    if (diff === 0) return 'Today'
+    if (diff === 1) return 'Tomorrow'
+    if (diff > 1 && diff < 7) return `In ${diff} days`
+    if (diff === -1) return 'Yesterday'
+    if (diff < 0) return `${-diff} days ago`
+    return null
+  } catch { return null }
+}
+
 export const StatusPage: React.FC = () => {
   const { pnrNumber } = useParams<{ pnrNumber: string }>()
   const navigate = useNavigate()
@@ -49,6 +64,7 @@ export const StatusPage: React.FC = () => {
   })
 
   const isTracking = pnrs.some(p => p.number === pnrNumber)
+  const isDemo = !!pnrNumber && isDemoPNR(pnrNumber)
 
   const handleTrackToggle = () => {
     if (!pnrData) return
@@ -58,9 +74,10 @@ export const StatusPage: React.FC = () => {
   const status = pnrData?.status
   const statusKey = status?.currentStatus ?? 'Unknown'
   const statusLabel = STATUS_LABEL[statusKey] ?? statusKey
+  const dayLabel = pnrData ? relativeDay(pnrData.dateOfJourney) : null
 
   return (
-    <div className="pt-10 pb-24">
+    <div className="pt-8 pb-24 fade-up">
       <button
         onClick={() => navigate('/')}
         className="link inline-flex items-center gap-2 text-[14px] font-medium text-ink-2 mb-12"
@@ -71,7 +88,6 @@ export const StatusPage: React.FC = () => {
         Back
       </button>
 
-      {/* Loading */}
       {isLoading && (
         <div className="space-y-12 animate-pulse">
           <div className="h-3 w-16 bg-rule rounded-full" />
@@ -84,7 +100,6 @@ export const StatusPage: React.FC = () => {
         </div>
       )}
 
-      {/* Error */}
       {error && !isLoading && (
         <motion.div
           initial={{ opacity: 0, y: 8 }}
@@ -98,29 +113,38 @@ export const StatusPage: React.FC = () => {
           <p className="text-[16px] text-ink-2 max-w-md mb-10 tracking-tight">
             {error instanceof Error ? error.message : 'Please try again in a moment.'}
           </p>
-          <button onClick={() => refetch()} className="btn-primary">
-            Try again
-          </button>
+          <div className="flex items-center gap-4">
+            <button onClick={() => refetch()} className="btn-primary">
+              Try again
+            </button>
+            <button onClick={() => navigate('/')} className="link text-[14px] font-medium text-ink-2">
+              Back to search
+            </button>
+          </div>
         </motion.div>
       )}
 
-      {/* Status content */}
       {pnrData && status && !isLoading && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.6 }}
+          transition={{ duration: 0.5 }}
         >
-          {/* The verdict — as direct as possible. */}
+          {/* Verdict */}
           <motion.section
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
             className="mb-20"
           >
-            <div className="flex items-center gap-3 mb-6">
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mb-6">
               <p className="type-eyebrow">PNR</p>
               <span className="type-mono text-[13px] text-ink-2 tracking-wider">{pnrNumber}</span>
+              {isDemo && (
+                <span className="text-[10px] tracking-[0.16em] uppercase text-ink-3 px-2 py-0.5 border border-rule rounded-full">
+                  Sample
+                </span>
+              )}
               {status.chartPrepared && (
                 <>
                   <span className="text-ink-3">·</span>
@@ -131,7 +155,7 @@ export const StatusPage: React.FC = () => {
 
             <h1
               className={cn('type-display', STATUS_TONE[statusKey] ?? 'text-ink')}
-              style={{ fontSize: 'clamp(64px, 12vw, 128px)' }}
+              style={{ fontSize: 'clamp(56px, 13vw, 132px)' }}
             >
               {statusLabel}.
             </h1>
@@ -144,19 +168,24 @@ export const StatusPage: React.FC = () => {
             )}
           </motion.section>
 
-          {/* Journey — typeset, not iconographic. */}
+          {/* Journey */}
           <motion.section
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 0.6, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
             className="mb-16"
           >
-            <p className="type-eyebrow mb-6">Journey</p>
+            <div className="flex items-baseline justify-between mb-8">
+              <p className="type-eyebrow">Journey</p>
+              {dayLabel && (
+                <p className="text-[13px] text-ink-2 tracking-tight">{dayLabel}</p>
+              )}
+            </div>
 
-            <div className="grid grid-cols-[1fr_auto_1fr] gap-4 sm:gap-8 items-end">
+            <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)] gap-6 sm:gap-12 items-end">
               <div>
                 <p className="type-eyebrow mb-2 text-[10px]">From</p>
-                <p className="type-headline text-ink" style={{ fontSize: 'clamp(28px, 4.5vw, 44px)' }}>
+                <p className="type-headline text-ink truncate" style={{ fontSize: 'clamp(28px, 4.5vw, 44px)' }}>
                   {pnrData.from || '—'}
                 </p>
                 <p className="type-mono text-[14px] text-ink-2 mt-2 tracking-wider">
@@ -164,15 +193,9 @@ export const StatusPage: React.FC = () => {
                 </p>
               </div>
 
-              <div className="pb-3">
-                <svg width="32" height="14" viewBox="0 0 32 14" fill="none" className="text-ink-3">
-                  <path d="M0 7h26M20 1l6 6-6 6" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </div>
-
               <div className="text-right">
                 <p className="type-eyebrow mb-2 text-[10px]">To</p>
-                <p className="type-headline text-ink" style={{ fontSize: 'clamp(28px, 4.5vw, 44px)' }}>
+                <p className="type-headline text-ink truncate" style={{ fontSize: 'clamp(28px, 4.5vw, 44px)' }}>
                   {pnrData.to || '—'}
                 </p>
                 <p className="type-mono text-[14px] text-ink-2 mt-2 tracking-wider">
@@ -181,7 +204,18 @@ export const StatusPage: React.FC = () => {
               </div>
             </div>
 
-            <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-y-6 gap-x-12 border-t border-rule pt-6">
+            {/* Route line — quiet, with a single dot. */}
+            <div className="relative mt-10 mb-8 h-[2px] bg-rule">
+              <div className="absolute left-0 -top-[3px] w-2 h-2 rounded-full bg-ink" />
+              <div className="absolute right-0 -top-[3px] w-2 h-2 rounded-full bg-ink" />
+              {status.trainInfo.duration && (
+                <div className="absolute left-1/2 -translate-x-1/2 -top-3 px-3 bg-paper">
+                  <span className="text-[11px] text-ink-2 tracking-tight">{status.trainInfo.duration}</span>
+                </div>
+              )}
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-6 gap-x-12">
               <Detail label="Train" value={
                 <>
                   <span className="type-mono text-ink mr-2">{pnrData.trainNumber}</span>
@@ -189,17 +223,18 @@ export const StatusPage: React.FC = () => {
                 </>
               } />
               <Detail label="Date" value={formatDate(pnrData.dateOfJourney)} />
-              {pnrData.class !== '—' && <Detail label="Class" value={pnrData.class} />}
+              {pnrData.class && pnrData.class !== '—' && <Detail label="Class" value={pnrData.class} />}
               {pnrData.quota && <Detail label="Quota" value={pnrData.quota} />}
+              {status.trainInfo.distance && <Detail label="Distance" value={status.trainInfo.distance} />}
             </div>
           </motion.section>
 
-          {/* Passengers — quiet table. */}
+          {/* Passengers */}
           {status.passengers.length > 0 && (
             <motion.section
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
+              transition={{ duration: 0.6, delay: 0.14, ease: [0.22, 1, 0.36, 1] }}
               className="mb-16"
             >
               <div className="flex items-baseline justify-between mb-4">
@@ -210,7 +245,8 @@ export const StatusPage: React.FC = () => {
               <ul className="border-t border-rule">
                 {status.passengers.map((passenger, i) => {
                   const pStatus = passenger.currentStatus
-                  const isFinal = pStatus === 'CNF' || pStatus === 'RAC'
+                  const seat = [passenger.coachPosition, passenger.seatNumber].filter(Boolean).join(' · ')
+                  const isFinal = pStatus.startsWith('CNF') || pStatus.startsWith('RAC')
                   return (
                     <li key={i} className="border-b border-rule">
                       <div className="grid grid-cols-[auto_1fr_auto] gap-4 items-center py-5">
@@ -221,11 +257,13 @@ export const StatusPage: React.FC = () => {
                           <p className="text-[16px] text-ink tracking-tight">
                             {passenger.name || `Passenger ${i + 1}`}
                           </p>
-                          {passenger.bookingStatus && passenger.bookingStatus !== pStatus && (
-                            <p className="text-[12px] text-ink-3 mt-0.5 tracking-tight">
-                              Booked as <span className="type-mono">{passenger.bookingStatus}</span>
-                            </p>
-                          )}
+                          <p className="text-[12px] text-ink-3 mt-0.5 tracking-tight">
+                            {seat
+                              ? <>Seat <span className="type-mono text-ink-2">{seat}</span></>
+                              : passenger.bookingStatus && passenger.bookingStatus !== pStatus
+                                ? <>Booked as <span className="type-mono">{passenger.bookingStatus}</span></>
+                                : 'Awaiting allocation'}
+                          </p>
                         </div>
                         <div className="text-right">
                           <p className={cn(
@@ -243,11 +281,11 @@ export const StatusPage: React.FC = () => {
             </motion.section>
           )}
 
-          {/* Action — one decision. */}
+          {/* Action */}
           <motion.section
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
+            transition={{ duration: 0.6, delay: 0.18 }}
             className="flex items-center justify-between gap-4 pt-2"
           >
             <button onClick={handleTrackToggle} className="btn-primary">

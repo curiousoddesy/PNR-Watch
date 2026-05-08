@@ -1,4 +1,5 @@
 import type { PNR, PNRStatus } from '../types'
+import { isDemoPNR, getDemoPNR } from './demoData'
 
 interface IRCTCResponse {
   success: boolean
@@ -31,6 +32,11 @@ const API_BASE = '/.netlify/functions'
  * Fetch PNR status from the Netlify serverless function (which proxies IRCTC)
  */
 export async function checkPNRStatus(pnrNumber: string): Promise<PNR> {
+  if (isDemoPNR(pnrNumber)) {
+    await new Promise(resolve => setTimeout(resolve, 600))
+    return getDemoPNR(pnrNumber)
+  }
+
   const response = await fetch(`${API_BASE}/check-pnr`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

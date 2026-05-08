@@ -10,34 +10,31 @@ interface AppLayoutProps {
 export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const location = useLocation()
   const { currentMode, setThemeMode } = useThemeContext()
-  const isHome = location.pathname === '/'
 
   return (
     <div className="min-h-screen bg-paper text-ink antialiased">
       <header
-        className="sticky top-0 z-30 bg-paper/80 backdrop-blur-md"
+        className="sticky top-0 z-30 bg-paper/85 backdrop-blur-md"
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
         <div className="mx-auto max-w-2xl px-6 h-14 flex items-center justify-between">
-          <Link to="/" className="link flex items-baseline gap-1 text-[17px] font-semibold tracking-tight">
+          <Link
+            to="/"
+            className="link flex items-baseline gap-0.5 text-[17px] font-semibold tracking-tight"
+            aria-label="PNR. — Home"
+          >
             <span>PNR</span>
             <span className="text-accent">.</span>
           </Link>
 
-          <div className="flex items-center gap-1">
-            {!isHome && (
-              <Link
-                to="/"
-                className="link text-[13px] font-medium text-ink-2 mr-2"
-              >
-                Search
-              </Link>
-            )}
+          <nav className="flex items-center gap-1">
             <Link
               to="/tracking"
               className={cn(
-                'text-[13px] font-medium mr-2 transition-opacity',
-                location.pathname === '/tracking' ? 'text-ink' : 'text-ink-2 hover:opacity-60'
+                'px-3 py-1.5 text-[13px] font-medium rounded-full transition-colors',
+                location.pathname === '/tracking'
+                  ? 'text-ink bg-rule'
+                  : 'text-ink-2 hover:text-ink'
               )}
             >
               Trips
@@ -45,7 +42,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
             <button
               onClick={() => setThemeMode(currentMode === 'dark' ? 'light' : 'dark')}
               className="btn-icon"
-              aria-label="Toggle theme"
+              aria-label={`Switch to ${currentMode === 'dark' ? 'light' : 'dark'} mode`}
             >
               {currentMode === 'dark' ? (
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
@@ -58,19 +55,20 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
                 </svg>
               )}
             </button>
-          </div>
+          </nav>
         </div>
         <div className="h-px bg-rule" />
       </header>
 
-      <main className="mx-auto max-w-2xl px-6">
+      <main key={location.pathname} className="mx-auto max-w-2xl px-6">
         {children}
       </main>
 
-      <footer className="mx-auto max-w-2xl px-6 py-12 mt-12 border-t border-rule">
-        <p className="text-[12px] text-ink-3 tracking-tight">
-          PNR. — Live train status, beautifully simple.
-        </p>
+      <footer className="mx-auto max-w-2xl px-6 py-10 mt-12">
+        <div className="border-t border-rule pt-6 flex items-center justify-between text-[12px] text-ink-3 tracking-tight">
+          <span>PNR. — quiet, automatic, always current.</span>
+          <span aria-hidden="true">·</span>
+        </div>
       </footer>
     </div>
   )
